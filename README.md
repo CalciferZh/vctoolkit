@@ -1,2 +1,3 @@
 # calciferzh_utils
-The functions I always use.
+
+This simple package contains functions the author always use in different projects.
