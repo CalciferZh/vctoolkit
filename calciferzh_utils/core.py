@@ -1,8 +1,9 @@
 import cv2
 import pickle
 import time
-
+import numpy as np
 from matplotlib import pyplot as plt
+
 
 def imshow_cv(img, name='OpenCV Image Show'):
   """
@@ -237,36 +238,36 @@ def one_hot_encoding(array, n_channels=18):
   shape = array.shape
   array = np.reshape(array, [-1])
   array = np.eye(n_channels)[array]
-  array = np.reshape(array, shape.append(n_channesl))
+  array = np.reshape(array, shape.append(n_channels))
   return array
 
 
 class Timer():
   def __init__(self):
-  """
-  Simple timer.
+    """
+    Simple timer.
 
-  """
-  self.start = None
-  self.end = None
-  self.interval = None
+    """
+    self.start = None
+    self.end = None
+    self.interval = None
 
   def tic(self):
-  """
-  Start timing.
+    """
+    Start timing.
 
-  """
-  self.start = time.time()
+    """
+    self.start = time.time()
 
   def toc(self):
-  """
-  End timing.
+    """
+    End timing.
 
-  Return
-  ------
-  Time since last `tic` called.
+    Return
+    ------
+    Time since last `tic` called.
 
-  """
-  self.end = time.time()
-  self.interval = self.end - self.start
-  return self.interval
+    """
+    self.end = time.time()
+    self.interval = self.end - self.start
+    return self.interval
