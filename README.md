@@ -1,3 +1,3 @@
-# calciferzh_utils
+# vctoolkit
 
-This simple package contains functions the author always use in different projects.
+A simple wrapper for commonly used tools in visual computing.

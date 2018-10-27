@@ -2,6 +2,7 @@ import cv2
 import pickle
 import time
 import numpy as np
+import copy
 from matplotlib import pyplot as plt
 
 
@@ -33,6 +34,26 @@ def imshow(img):
   plt.show()
 
 
+
+def imshow_multi(imgs, nrows, ncols):
+  """
+  Display images as grid.
+
+  Parameters
+  ----------
+  imgs: A list of images to be displayed.
+
+  nrows: How many rows.
+
+  ncols: How many columns.
+  """
+  fig = plt.figure()
+  for i, img in enumerate(imgs):
+    fig.add_subplot(nrows, ncols, i+1)
+    plt.imshow(img)
+  plt.show()
+
+
 def imshow_onerow(imgs):
   """
   Display images in a list in one row.
@@ -42,12 +63,7 @@ def imshow_onerow(imgs):
   imgs: List of images to be displayed.
 
   """
-  n = len(imgs)
-  fig = plt.figure()
-  for i, img in enumerate(imgs):
-    fig.add_subplot(1, n, i+1)
-    plt.imshow(img)
-  plt.show()
+  imshow_multi(imgs, 1, len(imgs))
 
 
 def imshow_2x2(imgs):
@@ -59,13 +75,7 @@ def imshow_2x2(imgs):
   imgs: A list of images to be displayed.
 
   """
-  if len(imgs) > 4:
-    raise ValueError('Too many images for 2x2 grid!')
-  fig = plt.figure()
-  for i, img in enumerate(imgs):
-    fig.add_subplot(2, 2, i+1)
-    plt.imshow(img)
-  plt.show()
+  imshow_multi(imgs, 2, 2)
 
 
 def imshow_3x2(imgs):
@@ -77,11 +87,7 @@ def imshow_3x2(imgs):
   imgs: A list of images to be displayed.
 
   """
-  fig = plt.figure()
-  for i, img in enumerate(imgs):
-    fig.add_subplot(3, 2, i+1)
-    plt.imshow(img)
-  plt.show()
+  imshow_multi(imgs, 3, 2)
 
 
 def pkl_load(path):
@@ -208,7 +214,6 @@ def ply_save_color_pcloud(path, pcloud, color):
       f.write(b'%f %f %f %d %d %d\n' % (v[0], v[1], v[2], c[0], c[1], c[2]))
 
 
-
 def one_hot_decoding(array):
   """
   One-hot decoding.
@@ -221,7 +226,7 @@ def one_hot_decoding(array):
   return np.argmax(array, axis=-1)
 
 
-def one_hot_encoding(array, n_channels=18):
+def one_hot_encoding(array, n_channels):
   """
   One-hot encode a given array.
 
@@ -235,10 +240,11 @@ def one_hot_encoding(array, n_channels=18):
   One-hot encoded ndarray with new channels at the last dimension.
 
   """
-  shape = array.shape
+  shape = list(copy.deepcopy(array.shape))
   array = np.reshape(array, [-1])
   array = np.eye(n_channels)[array]
-  array = np.reshape(array, shape.append(n_channels))
+  shape.append(n_channels)
+  array = np.reshape(array, shape)
   return array
 
 
