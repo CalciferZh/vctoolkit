@@ -270,8 +270,8 @@ class VideoReader:
       return None
     ret, frame = self.video.read()
     if ret:
-      return None
-    return frame
+      return frame
+    return None
 
   def next_frames(self, n_frames):
     """
@@ -305,10 +305,12 @@ class VideoReader:
     A list of frames.
     """
     frames = []
-    ret = True
-    while self.video.isOpened() and ret:
+    while self.video.isOpened():
       ret, frame = self.video.read()
-      frames.append(frame)
+      if ret:
+        frames.append(frame)
+      else:
+        break
     return frames
 
   def sequence(self, start, end):
