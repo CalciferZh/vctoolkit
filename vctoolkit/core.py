@@ -262,7 +262,7 @@ class VideoReader:
     self.width = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
     self.height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-  def read_next_frame(self):
+  def next_frame(self):
     """
     Read next frame.
     """
@@ -273,7 +273,7 @@ class VideoReader:
       return None
     return frame
 
-  def read_next_frames(self, n_frames):
+  def next_frames(self, n_frames):
     """
     Read next several frames.
 
@@ -296,7 +296,7 @@ class VideoReader:
         break
     return frames
 
-  def read_all_frames(self):
+  def all_frames(self):
     """
     Read all (remained) frames from video.
 
@@ -311,7 +311,7 @@ class VideoReader:
       frames.append(frame)
     return frames
 
-  def read_sequence(self, start, end):
+  def sequence(self, start, end):
     self.video.set(cv2.CAP_PROP_POS_FRAMES, start)
     frames = []
     for _ in range(start, end):
