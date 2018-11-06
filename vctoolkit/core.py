@@ -311,6 +311,17 @@ class VideoReader:
       frames.append(frame)
     return frames
 
+  def read_sequence(self, start, end):
+    self.video.set(cv2.CAP_PROP_POS_FRAMES, start)
+    frames = []
+    for _ in range(start, end):
+      ret, frame = self.video.read()
+      if ret:
+        frames.append(frame)
+      else:
+        break
+    return frames
+
   def close(self):
     """
     Release video resource.
