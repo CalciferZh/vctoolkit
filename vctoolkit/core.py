@@ -258,7 +258,7 @@ class VideoReader:
     path: Path to the video.
     """
     self.video = cv2.VideoCapture(path)
-    self.fps = cv2.VideoCapture(path)
+    self.fps = self.video.get(cv2.CAP_PROP_FPS)
     self.width = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
     self.height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
