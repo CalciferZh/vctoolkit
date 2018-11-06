@@ -34,7 +34,6 @@ def imshow(img):
   plt.show()
 
 
-
 def imshow_multi(imgs, nrows, ncols):
   """
   Display images as grid.
@@ -246,6 +245,117 @@ def one_hot_encoding(array, n_channels):
   shape.append(n_channels)
   array = np.reshape(array, shape)
   return array
+
+
+class VideoReader:
+  """
+  Read frames from video.
+  """
+  def __init__(self, path):
+    """
+    Parameters
+    ----------
+    path: Path to the video.
+    """
+    self.video = cv2.VideoCapture(path)
+    self.fps = cv2.VideoCapture(path)
+    self.width = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
+    self.height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+  def read_next_frame(self):
+    """
+    Read next frame.
+    """
+    if not self.video.isOpened():
+      return None
+    ret, frame = self.video.read()
+    if ret:
+      return None
+    return frame
+
+  def read_next_frames(self, n_frames):
+    """
+    Read next several frames.
+
+    Parameter
+    ---------
+    n_frames: How many frames to be read.
+
+    Return
+    ------
+    A list of read frames. Could be less than `n_frames` if video ends.
+    """
+    frames = []
+    for _ in range(n_frames):
+      if not self.video.isOpened():
+        break
+      ret, frame = self.video.read()
+      if ret:
+        frames.append(frame)
+      else:
+        break
+    return frames
+
+  def read_all_frames(self):
+    """
+    Read all (remained) frames from video.
+
+    Return
+    ------
+    A list of frames.
+    """
+    frames = []
+    ret = True
+    while self.video.isOpened() and ret:
+      ret, frame = self.video.read()
+      frames.append(frame)
+    return frames
+
+  def close(self):
+    """
+    Release video resource.
+    """
+    self.video.release()
+
+
+class VideoWriter:
+  """
+  Write frames to a video.
+  """
+  def __init__(self, path, width, height, fps):
+    """
+    Parameters
+    ----------
+    path: Path to the video.
+
+    width: Width of each frame.
+
+    height: Height of each frame.
+
+    fps: Frame per second.
+    """
+    self.video = cv2.VideoWriter(
+      path,
+      cv2.VideoWriter_fourcc(*'XVID'),
+      fps,
+      (width, height)
+    )
+
+  def write_frame(self, frame):
+    """
+    Write single frame.
+
+    Parameters
+    ----------
+    frame: Frame to be written.
+    """
+    self.video.write(frame)
+
+  def close(self):
+    """
+    Release resource.
+    """
+    self.video.release()
 
 
 class Timer():
