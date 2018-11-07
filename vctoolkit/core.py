@@ -261,7 +261,7 @@ class VideoReader:
     self.fps = self.video.get(cv2.CAP_PROP_FPS)
     self.width = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
     self.height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    self.n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) + 1
+    self.n_frames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT)) + 1
 
   def next_frame(self):
     """
