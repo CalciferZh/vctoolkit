@@ -3,7 +3,18 @@ import pickle
 import time
 import numpy as np
 import copy
+import imageio
 from matplotlib import pyplot as plt
+
+
+color_lib = [
+  [255, 0, 0], [230, 25, 75], [60, 180, 75], [255, 225, 25],
+  [0, 130, 200], [245, 130, 48], [145, 30, 180], [70, 240, 240],
+  [240, 50, 230], [210, 245, 60], [250, 190, 190], [0, 128, 128],
+  [230, 190, 255], [170, 110, 40], [255, 250, 200], [128, 0, 0],
+  [170, 255, 195], [128, 128, 0], [255, 215, 180], [0, 0, 128],
+  [128, 128, 128]
+]
 
 
 def imshow_cv(img, name='OpenCV Image Show'):
@@ -245,6 +256,45 @@ def one_hot_encoding(array, n_channels):
   shape.append(n_channels)
   array = np.reshape(array, shape)
   return array
+
+
+def imread(path):
+  return imageio.imread(path)
+
+
+def imsave(path, img):
+  return imageio.imsave(path, img)
+
+
+def imresize(img, size):
+  return cv2.resize(img, size, cv2.INTER_LINEAR)
+
+
+def tensor_shape(t):
+  return t.get_shape().as_list()
+
+
+def print_important(s):
+  print('='*80)
+  print(s)
+  print('='*80)
+
+
+def arr_identical(a, b, print_info=True):
+  if a.shape != b.shape:
+    if print_info:
+      print('Different shape: a: {}, b: {}'.format(a.shape, b.shape))
+    return False
+  else:
+    return np.allclose(a, b)
+
+
+def save_obj(verts, faces, path):
+  with open(path, 'w') as f:
+    for v in verts:
+      f.write('v %f %f %f\n' % (v[0], v[1], v[2]))
+    for f in faces + 1:
+      f.write('f %d %d %d\n' % (f[0], f[1], f[2]))
 
 
 class VideoReader:
