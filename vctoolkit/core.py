@@ -315,11 +315,12 @@ class VideoReader:
 
   def next_frame(self):
     """
-    Read next frame.
+    Read next frame in RGB format.
     """
     if not self.video.isOpened():
       return None
     ret, frame = self.video.read()
+    frame = np.flip(frame, axis=-1).copy()
     if ret:
       return frame
     return None
@@ -341,6 +342,7 @@ class VideoReader:
       if not self.video.isOpened():
         break
       ret, frame = self.video.read()
+      frame = np.flip(frame, axis=-1).copy()
       if ret:
         frames.append(frame)
       else:
@@ -358,6 +360,7 @@ class VideoReader:
     frames = []
     while self.video.isOpened():
       ret, frame = self.video.read()
+      frame = np.flip(frame, axis=-1).copy()
       if ret:
         frames.append(frame)
       else:
@@ -369,6 +372,7 @@ class VideoReader:
     frames = []
     for _ in range(start, end):
       ret, frame = self.video.read()
+      frame = np.flip(frame, axis=-1).copy()
       if ret:
         frames.append(frame)
       else:
@@ -399,21 +403,18 @@ class VideoWriter:
     fps: Frame per second.
     """
     self.video = cv2.VideoWriter(
-      path,
-      cv2.VideoWriter_fourcc(*'XVID'),
-      fps,
-      (width, height)
+      path, cv2.VideoWriter_fourcc(*'XVID'), fps, (width, height)
     )
 
   def write_frame(self, frame):
     """
-    Write single frame.
+    Write single frame in RGB format.
 
     Parameters
     ----------
     frame: Frame to be written.
     """
-    self.video.write(frame)
+    self.video.write(np.flip(frame, axis=-1).copy())
 
   def close(self):
     """
