@@ -17,6 +17,12 @@ color_lib = [
 ]
 
 
+def read_all_lines(path):
+  with open(path, 'r') as f:
+    lines = f.read().splitlines()
+  return lines
+
+
 def imshow_cv(img, name='OpenCV Image Show'):
   """
   Display an image using opencv.
