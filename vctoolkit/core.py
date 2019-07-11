@@ -295,14 +295,6 @@ def arr_identical(a, b, print_info=True):
     return np.allclose(a, b)
 
 
-def save_obj(verts, faces, path):
-  with open(path, 'w') as f:
-    for v in verts:
-      f.write('v %f %f %f\n' % (v[0], v[1], v[2]))
-    for f in faces + 1:
-      f.write('f %d %d %d\n' % (f[0], f[1], f[2]))
-
-
 class VideoReader:
   """
   Read frames from video.
