@@ -5,6 +5,7 @@ import numpy as np
 import copy
 import imageio
 from matplotlib import pyplot as plt
+from tqdm import tqdm
 
 
 color_lib = [
@@ -273,6 +274,14 @@ def imsave(path, img):
 
 
 def imresize(img, size):
+  """
+  Resize an image with cv2.INTER_LINEAR.
+
+  Parameters
+  ----------
+  size: (width, height)
+
+  """
   return cv2.resize(img, size, cv2.INTER_LINEAR)
 
 
@@ -318,10 +327,10 @@ class VideoReader:
     if not self.video.isOpened():
       return None
     ret, frame = self.video.read()
+    if not ret:
+      return None
     frame = np.flip(frame, axis=-1).copy()
-    if ret:
-      return frame
-    return None
+    return frame
 
   def next_frames(self, n_frames):
     """
