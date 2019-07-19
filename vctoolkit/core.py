@@ -459,3 +459,4 @@ class Timer():
     self.end = time.time()
     self.interval = self.end - self.start
     return self.interval
+
