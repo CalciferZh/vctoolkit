@@ -67,20 +67,18 @@ class TriMeshViewer:
     self.clock = pygame.time.Clock()
 
     glClearColor(1.0, 1.0, 1.0, 0)
-    glShadeModel(GL_SMOOTH)
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
+    glShadeModel(GL_FLAT)
 
-    glLightfv(GL_LIGHT0,GL_POSITION,np.array([0.0,0.0,1.0,0],dtype=np.float32))
+    glMaterialfv(GL_FRONT, GL_AMBIENT, np.array([.3]*3, dtype=np.float32))
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, np.array([1.0]*3, dtype=np.float32))
+    glMaterialfv(GL_FRONT, GL_SPECULAR, np.array([.0]*3, dtype=np.float32))
+    glMaterialf(GL_FRONT, GL_SHININESS,.4 * 128.0)
+
+    glLightfv(GL_LIGHT0,GL_POSITION,np.array([0.0,1.0,0.0,0.0],dtype=np.float32))
     glLightfv(GL_LIGHT0,GL_SPECULAR,np.array([0.0,0.0,0.0,1],dtype=np.float32))
-    glLightfv(GL_LIGHT0,GL_DIFFUSE,np.array([0.9,0.9,0.9,1],dtype=np.float32))
+    glLightfv(GL_LIGHT0,GL_DIFFUSE,np.array([1.0,1.0,1.0,1],dtype=np.float32))
     glLightfv(GL_LIGHT0,GL_AMBIENT,np.array([0.3,0.3,0.3,1],dtype=np.float32))
     glEnable(GL_LIGHT0)
-
-    glLightfv(GL_LIGHT1,GL_POSITION,np.array([0.0,1.0,0.0,0],dtype=np.float32))
-    glLightfv(GL_LIGHT1,GL_SPECULAR,np.array([0.0,0.0,0.0,1],dtype=np.float32))
-    glLightfv(GL_LIGHT1,GL_DIFFUSE,np.array([0.9,0.9,0.9,1],dtype=np.float32))
-    glLightfv(GL_LIGHT1,GL_AMBIENT,np.array([0.3,0.3,0.3,1],dtype=np.float32))
-    glEnable(GL_LIGHT1)
 
     glEnable(GL_LIGHTING)
     glEnable(GL_DEPTH_TEST)
