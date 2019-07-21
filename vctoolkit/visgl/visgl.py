@@ -5,7 +5,7 @@ import datetime
 from transforms3d.axangles import axangle2mat
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from .core import *
+# from .core import *
 
 
 class TriMeshViewer:
