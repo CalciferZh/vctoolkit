@@ -23,11 +23,17 @@ class TriMeshViewer:
     self.n_verts = None
     self.n_faces = None
     self.frame_idx = None
+
+    self.dup_faces = None
+    self.dup_normals = None
+    self.verts_mapping = None
+    self.normal_mapping = None
+
     self.n_frames = -1
     self.setup_opengl()
 
   def get_normal(self, faces):
-    '''Given faces, return normal vector(NOT UNIT VECTOR).'''
+    '''Given faces, return per face unit normal vector.'''
     p1x, p1y, p1z = faces[:, 0, 0], faces[:, 0, 1], faces[:, 0, 2]
     p2x, p2y, p2z = faces[:, 1, 0], faces[:, 1, 1], faces[:, 1, 2]
     p3x, p3y, p3z = faces[:, 2, 0], faces[:, 2, 1], faces[:, 2, 2]
@@ -35,29 +41,27 @@ class TriMeshViewer:
     y_stick = (p2z - p1z) * (p3x - p1x) - (p2x - p1x) * (p3z - p1z)
     z_stick = (p2x - p1x) * (p3y - p1y) - (p2y - p1y) * (p3x - p1x)
     normals = np.stack((x_stick, y_stick, z_stick), axis=1)
+    normals /=np.linalg.norm(normals, axis=1, keepdims=True)
     return normals
 
-  def setup_vftable(self):
-    # for vertex normal computation
-    storage = 9 # how many faces each vertex is related to
-    cnt = np.zeros(self.n_verts, dtype=np.int)
-    # vftable: the faces each vertex belongs to
-    # used to compute vertex normal
-    # which is the average of faces' normal it belongs to
-    self.vftable = np.zeros((self.n_verts, storage), dtype=np.int32)
-    for idx in range(self.n_faces):
-      v1, v2, v3 = self.faces[idx]
-      self.vftable[v1, cnt[v1]] = idx
-      self.vftable[v2, cnt[v2]] = idx
-      self.vftable[v3, cnt[v3]] = idx
-      cnt[v1] += 1
-      cnt[v2] += 1
-      cnt[v3] += 1
-    # we use a "virtual face" to fill "blanks"
-    # this face's normal will be set to (0,0,0)
-    for i in range(self.n_verts):
-      for j in range(cnt[i], storage):
-        self.vftable[i, j] = self.n_faces
+  def setup_dup(self):
+    """
+    For vertices normal computation.
+    Since OpenGL only supports per vertex normal, here we duplicate the vertices
+    so that each face has 3 same-normal-vertices belong to itself only.
+    """
+    self.dup_faces = np.empty([self.n_faces, 3], np.int32)
+    # self.dup_verts[np.arange(self.n_faces*3] = self.verts[self.verts_mapping]
+    self.verts_mapping = np.empty(self.n_faces * 3, np.int32)
+    # self.dup_normals[np.arrange(self.n_faces*3)] = \
+    #   face_normals[self.normal_mapping]
+    self.normal_mapping = np.empty(self.n_faces * 3, np.int32)
+
+    for i in range(self.n_faces):
+      for j in range(3):
+        self.dup_faces[i, j] = i * 3 + j
+        self.verts_mapping[i * 3 + j] = self.faces[i][j]
+        self.normal_mapping[i * 3 + j] = i
 
   def setup_opengl(self):
     pygame.init()
@@ -74,11 +78,23 @@ class TriMeshViewer:
     glMaterialfv(GL_FRONT, GL_SPECULAR, np.array([.0]*3, dtype=np.float32))
     glMaterialf(GL_FRONT, GL_SHININESS,.4 * 128.0)
 
-    glLightfv(GL_LIGHT0,GL_POSITION,np.array([0.0,1.0,0.0,0.0],dtype=np.float32))
+    glLightfv(GL_LIGHT0,GL_POSITION,np.array([0.0,-1.0,0.0,0.0],dtype=np.float32))
     glLightfv(GL_LIGHT0,GL_SPECULAR,np.array([0.0,0.0,0.0,1],dtype=np.float32))
     glLightfv(GL_LIGHT0,GL_DIFFUSE,np.array([1.0,1.0,1.0,1],dtype=np.float32))
     glLightfv(GL_LIGHT0,GL_AMBIENT,np.array([0.3,0.3,0.3,1],dtype=np.float32))
     glEnable(GL_LIGHT0)
+
+    glLightfv(GL_LIGHT1,GL_POSITION,np.array([0.0,0.0,-1.0,0.0],dtype=np.float32))
+    glLightfv(GL_LIGHT1,GL_SPECULAR,np.array([0.0,0.0,0.0,1],dtype=np.float32))
+    glLightfv(GL_LIGHT1,GL_DIFFUSE,np.array([1.0,1.0,1.0,1],dtype=np.float32))
+    glLightfv(GL_LIGHT1,GL_AMBIENT,np.array([0.3,0.3,0.3,1],dtype=np.float32))
+    glEnable(GL_LIGHT1)
+
+    glLightfv(GL_LIGHT2,GL_POSITION,np.array([-1.0,0.0,0.0,0.0],dtype=np.float32))
+    glLightfv(GL_LIGHT2,GL_SPECULAR,np.array([0.0,0.0,0.0,1],dtype=np.float32))
+    glLightfv(GL_LIGHT2,GL_DIFFUSE,np.array([1.0,1.0,1.0,1],dtype=np.float32))
+    glLightfv(GL_LIGHT2,GL_AMBIENT,np.array([0.3,0.3,0.3,1],dtype=np.float32))
+    glEnable(GL_LIGHT2)
 
     glEnable(GL_LIGHTING)
     glEnable(GL_DEPTH_TEST)
@@ -156,24 +172,16 @@ class TriMeshViewer:
     verts -= self.trans_v
     verts[..., 2] -= self.cam_offset
 
-    faces_coord = verts[self.faces]
-    face_normals = self.get_normal(faces_coord)
-    face_normals = \
-      face_normals / np.linalg.norm(face_normals, axis=1, keepdims=True)
-    face_normals = np.append(face_normals, np.zeros((1,3)), axis=0)
+    face_coords = verts[self.faces]
+    face_normals = self.get_normal(face_coords)
 
-    vert_normals = face_normals[self.vftable]
-    vert_normals = np.sum(vert_normals, axis=1)
-    vert_normals = vert_normals / \
-      np.linalg.norm(vert_normals, axis=1, keepdims=True)
-
-    verts = verts.astype(np.float32).copy()
-    vert_normals = vert_normals.astype(np.float32).copy()
+    dup_verts = verts[self.verts_mapping].copy()
+    dup_normals = face_normals[self.normal_mapping].copy()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glVertexPointerf(verts)
-    glNormalPointerf(vert_normals)
-    glDrawElementsui(GL_TRIANGLES, self.faces)
+    glVertexPointerf(dup_verts)
+    glNormalPointerf(dup_normals)
+    glDrawElementsui(GL_TRIANGLES, self.dup_faces)
 
   def run(self, verts, faces, video_path=None, video_fps=30):
     self.faces = faces.astype(np.int32).copy()
@@ -183,7 +191,7 @@ class TriMeshViewer:
     self.n_frames, self.n_verts, _ = self.verts.shape
     self.n_faces = self.faces.shape[0]
     self.norm_verts()
-    self.setup_vftable()
+    self.setup_dup()
 
     self.frame_idx = -1
 
