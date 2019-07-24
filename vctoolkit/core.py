@@ -410,7 +410,7 @@ class VideoWriter:
     fps: Frame per second.
     """
     self.video = cv2.VideoWriter(
-      path, cv2.VideoWriter_fourcc(*'XVID'), fps, (width, height)
+      path, cv2.VideoWriter_fourcc(*'H264'), fps, (width, height)
     )
 
   def write_frame(self, frame):

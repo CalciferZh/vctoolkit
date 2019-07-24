@@ -13,7 +13,7 @@ class TriMeshViewer:
     self.rot_mat = np.eye(3)
     self.trans_v = np.zeros(3)
     self.speed_rot = np.pi / 45
-    self.speed_trans = 0.1
+    self.speed_trans = 0.02
     self.done = False
     self.playing = False
     self.window_size = size
@@ -23,6 +23,7 @@ class TriMeshViewer:
     self.n_verts = None
     self.n_faces = None
     self.frame_idx = None
+    self.clock = pygame.time.Clock()
 
     self.dup_faces = None
     self.dup_normals = None
@@ -112,6 +113,10 @@ class TriMeshViewer:
           self.rot_mat = np.eye(3)
         elif event.key == pygame.K_SPACE:
           self.playing = not self.playing
+        elif event.key == pygame.K_d:
+          self.frame_idx -= 1
+        elif event.key == pygame.K_f:
+          self.frame_idx += 1
         elif event.key == pygame.K_p:
           img = pygame.image.tostring(self.screen, 'RGB')
           img = pygame.image.fromstring(img, self.window_size, 'RGB')
@@ -142,22 +147,22 @@ class TriMeshViewer:
         np.matmul(axangle2mat(rot_ax, self.speed_rot), self.rot_mat)
 
     # translation
-    if pressed[pygame.K_a]:
+    if pressed[pygame.K_LEFT]:
       self.trans_v[0] += self.speed_trans
-    if pressed[pygame.K_d]:
+    if pressed[pygame.K_RIGHT]:
       self.trans_v[0] -= self.speed_trans
-    if pressed[pygame.K_w]:
+    if pressed[pygame.K_UP]:
       self.trans_v[1] -= self.speed_trans
-    if pressed[pygame.K_s]:
+    if pressed[pygame.K_DOWN]:
       self.trans_v[1] += self.speed_trans
     if pressed[pygame.K_q]:
       self.trans_v[2] += self.speed_trans
     if pressed[pygame.K_e]:
       self.trans_v[2] -= self.speed_trans
 
-    if pressed[pygame.K_COMMA]:
+    if pressed[pygame.K_a]:
       self.frame_idx -= 1
-    if pressed[pygame.K_PERIOD]:
+    if pressed[pygame.K_s]:
       self.frame_idx += 1
 
   def norm_verts(self):
@@ -183,7 +188,7 @@ class TriMeshViewer:
     glNormalPointerf(dup_normals)
     glDrawElementsui(GL_TRIANGLES, self.dup_faces)
 
-  def run(self, verts, faces, video_path=None, video_fps=30):
+  def run(self, verts, faces, video_path=None, video_fps=30, run_fps=30):
     self.faces = faces.astype(np.int32).copy()
     if type(verts) == list:
       verts = np.stack(verts, 0)
@@ -229,6 +234,9 @@ class TriMeshViewer:
         self.frame_idx += 1
       if self.frame_idx >= self.n_frames and video_path is not None:
         self.done = True
+
+      if run_fps is not None:
+        self.clock.tick(run_fps)
 
     pygame.quit()
     if video_path is not None:
