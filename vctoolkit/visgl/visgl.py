@@ -235,7 +235,7 @@ class TriMeshViewer:
       if self.frame_idx >= self.n_frames and video_path is not None:
         self.done = True
 
-      if run_fps is not None:
+      if run_fps is not None and video_path is None:
         self.clock.tick(run_fps)
 
     pygame.quit()
