@@ -6,6 +6,7 @@ import copy
 import imageio
 from matplotlib import pyplot as plt
 from tqdm import tqdm
+import open3d as o3d
 
 
 color_lib = [
@@ -496,3 +497,28 @@ class OneEuroFilter:
     edx = self.dx_filter.process(dx, self.compute_alpha(self.dcutoff))
     cutoff = self.mincutoff + self.beta * np.abs(edx)
     return self.x_filter.process(x, self.compute_alpha(cutoff))
+
+
+def render_sequence_3d(verts, faces, width, height, video_path, fps=30):
+  vis = o3d.visualization.Visualizer()
+  vis.create_window(width=width, height=height)
+  writer = VideoWriter(video_path, width, height, fps)
+
+  mesh = o3d.geometry.TriangleMesh()
+  mesh.triangles = o3d.utility.Vector3iVector(faces)
+  vis.add_geometry(mesh)
+
+  for v in verts:
+    mesh.vertices = o3d.utility.Vector3dVector(v)
+    mesh.compute_vertex_normals()
+    vis.update_geometry()
+    vis.poll_events()
+    vis.update_renderer()
+    frame = np.asarray(vis.capture_screen_float_buffer())
+    print(np.min(frame))
+    print(np.max(frame))
+    # frame = (np.asarray() * 255).astype(np.uint8)
+    # imshow(frame)
+    # writer.write_frame(frame)
+
+  writer.close()
