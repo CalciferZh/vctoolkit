@@ -499,26 +499,28 @@ class OneEuroFilter:
     return self.x_filter.process(x, self.compute_alpha(cutoff))
 
 
-def render_sequence_3d(verts, faces, width, height, video_path, fps=30):
+def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
+                       auto_norm=True, show_window=False):
+  if auto_norm:
+    scale = np.max(np.max(verts[0], axis=0) - np.min(verts[0], axis=0))
+    verts = [v / scale for v in verts]
+
   vis = o3d.visualization.Visualizer()
-  vis.create_window(width=width, height=height)
+  vis.create_window(width=width, height=height, visible=show_window)
   writer = VideoWriter(video_path, width, height, fps)
 
   mesh = o3d.geometry.TriangleMesh()
   mesh.triangles = o3d.utility.Vector3iVector(faces)
+  mesh.vertices = o3d.utility.Vector3dVector(verts[0] / 1000)
   vis.add_geometry(mesh)
 
-  for v in verts:
-    mesh.vertices = o3d.utility.Vector3dVector(v)
+  for v in tqdm(verts, ascii=True):
+    mesh.vertices = o3d.utility.Vector3dVector(v / 1000)
     mesh.compute_vertex_normals()
     vis.update_geometry()
     vis.poll_events()
     vis.update_renderer()
-    frame = np.asarray(vis.capture_screen_float_buffer())
-    print(np.min(frame))
-    print(np.max(frame))
-    # frame = (np.asarray() * 255).astype(np.uint8)
-    # imshow(frame)
-    # writer.write_frame(frame)
+    frame = (np.asarray(vis.capture_screen_float_buffer()) * 255).astype(np.uint8)
+    writer.write_frame(frame)
 
   writer.close()
