@@ -500,10 +500,14 @@ class OneEuroFilter:
 
 def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
                        visible=False):
+  if type(verts) == list:
+    verts = np.stack(verts, axis=0)
+  large_idx = np.argmax(np.sum(np.linalg.norm(verts, axis=-1), axis=-1))
+
   writer = VideoWriter(video_path, width, height, fps)
   mesh = o3d.geometry.TriangleMesh()
   mesh.triangles = o3d.utility.Vector3iVector(faces)
-  mesh.vertices = o3d.utility.Vector3dVector(verts[0])
+  mesh.vertices = o3d.utility.Vector3dVector(verts[large_idx])
 
   vis = o3d.visualization.Visualizer()
   vis.create_window(width=width, height=height, visible=visible)
