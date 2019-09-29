@@ -499,19 +499,34 @@ class OneEuroFilter:
 
 
 def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
-                       visible=False):
+                       visible=False, need_norm=True):
   if type(verts) == list:
-    verts = np.stack(verts, axis=0)
-  large_idx = np.argmax(np.sum(np.linalg.norm(verts, axis=-1), axis=-1))
+    verts = np.stack(verts, 0)
+
+  scale = np.max(np.max(verts, axis=(0, 1)) - np.min(verts, axis=(0, 1)))
+  mean = np.mean(verts)
+  verts = (verts - mean) / scale
+
+  cam_offset = 1.2
 
   writer = VideoWriter(video_path, width, height, fps)
+
   mesh = o3d.geometry.TriangleMesh()
   mesh.triangles = o3d.utility.Vector3iVector(faces)
-  mesh.vertices = o3d.utility.Vector3dVector(verts[large_idx])
+  mesh.vertices = o3d.utility.Vector3dVector(verts[0])
 
   vis = o3d.visualization.Visualizer()
   vis.create_window(width=width, height=height, visible=visible)
   vis.add_geometry(mesh)
+  view_control = vis.get_view_control()
+  cam_params = view_control.convert_to_pinhole_camera_parameters()
+  cam_params.extrinsic = np.array([
+    [1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, cam_offset],
+    [0, 0, 0, 1],
+  ])
+  view_control.convert_from_pinhole_camera_parameters(cam_params)
 
   for v in tqdm(verts, ascii=True):
     mesh.vertices = o3d.utility.Vector3dVector(v)
