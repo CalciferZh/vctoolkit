@@ -368,11 +368,10 @@ class VideoReader:
     frames = []
     while self.video.isOpened():
       ret, frame = self.video.read()
-      frame = np.flip(frame, axis=-1).copy()
-      if ret:
-        frames.append(frame)
-      else:
+      if not ret:
         break
+      frame = np.flip(frame, axis=-1).copy()
+      frames.append(frame)
     return frames
 
   def sequence(self, start, end):
@@ -500,22 +499,18 @@ class OneEuroFilter:
 
 
 def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
-                       auto_norm=True, show_window=False):
-  if auto_norm:
-    scale = np.max(np.max(verts[0], axis=0) - np.min(verts[0], axis=0))
-    verts = [v / scale for v in verts]
-
-  vis = o3d.visualization.Visualizer()
-  vis.create_window(width=width, height=height, visible=show_window)
+                       visible=False):
   writer = VideoWriter(video_path, width, height, fps)
-
   mesh = o3d.geometry.TriangleMesh()
   mesh.triangles = o3d.utility.Vector3iVector(faces)
-  mesh.vertices = o3d.utility.Vector3dVector(verts[0] / 1000)
+  mesh.vertices = o3d.utility.Vector3dVector(verts[0])
+
+  vis = o3d.visualization.Visualizer()
+  vis.create_window(width=width, height=height, visible=visible)
   vis.add_geometry(mesh)
 
   for v in tqdm(verts, ascii=True):
-    mesh.vertices = o3d.utility.Vector3dVector(v / 1000)
+    mesh.vertices = o3d.utility.Vector3dVector(v)
     mesh.compute_vertex_normals()
     vis.update_geometry()
     vis.poll_events()
