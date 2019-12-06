@@ -430,35 +430,20 @@ class VideoWriter:
     self.video.release()
 
 
-class Timer():
+class Timer:
   def __init__(self):
-    """
-    Simple timer.
+    self.last_tic = None
+    self.memory = {}
 
-    """
-    self.start = None
-    self.end = None
-    self.interval = None
-
-  def tic(self):
-    """
-    Start timing.
-
-    """
-    self.start = time.time()
-
-  def toc(self):
-    """
-    End timing.
-
-    Return
-    ------
-    Time since last `tic` called.
-
-    """
-    self.end = time.time()
-    self.interval = self.end - self.start
-    return self.interval
+  def tic(self, key=None):
+    curr_time = time.time()
+    interval = 0.0
+    if self.last_tic is not None:
+      interval = curr_time - self.last_tic
+      if key is not None:
+        self.memory[key] = interval
+    self.last_tic = curr_time
+    return interval
 
 
 class LowPassFilter:
