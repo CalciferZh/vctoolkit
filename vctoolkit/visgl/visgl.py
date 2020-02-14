@@ -165,6 +165,9 @@ class TriMeshViewer:
     if pressed[pygame.K_s]:
       self.frame_idx += 1
 
+    self.frame_idx = max(self.frame_idx, 0)
+    self.frame_idx = min(self.frame_idx, self.n_frames)
+
   def norm_verts(self):
     maxi = np.max(self.verts, axis=(0, 1))
     mini = np.min(self.verts, axis=(0, 1))
