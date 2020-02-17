@@ -322,3 +322,11 @@ def camera_proj(k, xyz):
   uvd = np.dot(k, xyz.T)
   uv = np.flip((uvd / uvd[2:3, :])[:2].T, -1).copy()
   return uv
+
+
+def calculate_auc(xs, ys):
+  length = xs[-1] - xs[0]
+  area = 0
+  for i in range(len(ys) - 1):
+    area += (ys[i] + ys[i + 1]) * (xs[i + 1] - xs[i]) / 2 / length
+  return area
