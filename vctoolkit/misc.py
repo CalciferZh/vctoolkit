@@ -325,8 +325,50 @@ def camera_proj(k, xyz):
 
 
 def compute_auc(xs, ys):
+  """
+  Compute area under curve (AuC).
+
+  Parameters
+  ----------
+  xs : list
+    A list of x values.
+  ys : list
+    A list of y values corresponding to x.
+
+  Returns
+  -------
+  float
+    Area under curve.
+  """
   length = xs[-1] - xs[0]
   area = 0
   for i in range(len(ys) - 1):
     area += (ys[i] + ys[i + 1]) * (xs[i + 1] - xs[i]) / 2 / length
   return area
+
+
+def compute_pck(errors, thres_range, n_step):
+  """
+  Compute percentage of correct keypoints (PCK) under a range of thresholds.
+
+  Parameters
+  ----------
+  errors : np.ndarray, shape [n]
+    Errors of all joints of all test samples.
+  thres_range : tuple
+    Threshold range, (min, max)
+  n_step : int, optional
+    Number of steps between the threshold range, by default 16
+
+  Returns
+  -------
+  list
+    Error thresholds.
+  list
+    PCK for each threshold.
+  """
+  xs = np.linspace(thres_range[0], thres_range[1], num=n_step)
+  ys = []
+  for x in xs:
+    ys.append(np.sum(errors < x) / errors.shape[0])
+  return xs, ys

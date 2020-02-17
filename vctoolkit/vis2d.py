@@ -127,3 +127,39 @@ def render_bones_from_hmap(hmap, canvas, parents, thickness=None):
   coords = hmap_to_uv(hmap)
   bones = render_bones_from_uv(coords, canvas, parents, thickness)
   return bones
+
+
+def render_bones_plt(joints, parents):
+  """
+  Render bones in 3D with matplotlib.
+
+  Parameters
+  ----------
+  joints : np.ndarray
+    Joint positions.
+  parents : list
+    Parent joint of each joint.
+  """
+  from mpl_toolkits.mplot3d import Axes3D
+  fig = plt.figure()
+  ax = Axes3D(fig)
+
+  ax.set_xlim3d(-1.5, 1.5)
+  ax.set_ylim3d(-1.5, 1.5)
+  ax.set_zlim3d(-1.5, 1.5)
+
+  ax.grid(False)
+  ax.set_xticks([])
+  ax.set_yticks([])
+  ax.set_zticks([])
+  ax.set_axis_off()
+  ax.view_init(-90, -90)
+
+  for c, p in enumerate(parents):
+    if p is None:
+      continue
+    xs = [joints[c, 0], joints[p, 0]]
+    ys = [joints[c, 1], joints[p, 1]]
+    zs = [joints[c, 2], joints[p, 2]]
+    plt.plot(xs, ys, zs, c=color_lib[p])
+  plt.show()
