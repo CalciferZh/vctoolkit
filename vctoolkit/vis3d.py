@@ -2,6 +2,7 @@ import numpy as np
 import open3d as o3d
 from .io import *
 from tqdm import tqdm
+from transforms3d.axangles import axangle2mat
 
 
 def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
@@ -94,11 +95,13 @@ def joints_to_mesh_prism(joints, parents, thickness=0.2):
   n_bones = len(list(filter(lambda x: x is not None, parents)))
   faces = np.empty([n_bones * 8, 3], dtype=np.int32)
   verts = np.empty([n_bones * 6, 3], dtype=np.float32)
-  for c, p in enumerate(parents):
-    if p is None:
+  bone_idx = -1
+  for child, parent in enumerate(parents):
+    if parent is None:
       continue
-    a = joints[p]
-    b = joints[c]
+    bone_idx += 1
+    a = joints[parent]
+    b = joints[child]
     ab = b - a
     f = a + thickness * ab
 
@@ -114,21 +117,29 @@ def joints_to_mesh_prism(joints, parents, thickness=0.2):
     e = np.transpose(axangle2mat(ab, np.pi/2).dot(np.transpose(fd))) + f
     g = np.transpose(axangle2mat(ab, np.pi).dot(np.transpose(fd))) + f
 
-    verts[c*6+0] = a
-    verts[c*6+1] = b
-    verts[c*6+2] = c
-    verts[c*6+3] = d
-    verts[c*6+4] = e
-    verts[c*6+5] = g
+    verts[bone_idx*6+0] = a
+    verts[bone_idx*6+1] = b
+    verts[bone_idx*6+2] = c
+    verts[bone_idx*6+3] = d
+    verts[bone_idx*6+4] = e
+    verts[bone_idx*6+5] = g
 
-    faces[c*8+0] = np.flip(np.array([0, 2, 3], dtype=np.int32), axis=0) + c * 6
-    faces[c*8+1] = np.flip(np.array([0, 3, 4], dtype=np.int32), axis=0) + c * 6
-    faces[c*8+2] = np.flip(np.array([0, 4, 5], dtype=np.int32), axis=0) + c * 6
-    faces[c*8+3] = np.flip(np.array([0, 5, 2], dtype=np.int32), axis=0) + c * 6
-    faces[c*8+4] = np.flip(np.array([1, 4, 3], dtype=np.int32), axis=0) + c * 6
-    faces[c*8+5] = np.flip(np.array([1, 3, 2], dtype=np.int32), axis=0) + c * 6
-    faces[c*8+6] = np.flip(np.array([1, 5, 4], dtype=np.int32), axis=0) + c * 6
-    faces[c*8+7] = np.flip(np.array([1, 2, 5], dtype=np.int32), axis=0) + c * 6
+    faces[bone_idx*8+0] = \
+      np.flip(np.array([0, 2, 3], dtype=np.int32), axis=0) + bone_idx * 6
+    faces[bone_idx*8+1] = \
+      np.flip(np.array([0, 3, 4], dtype=np.int32), axis=0) + bone_idx * 6
+    faces[bone_idx*8+2] = \
+      np.flip(np.array([0, 4, 5], dtype=np.int32), axis=0) + bone_idx * 6
+    faces[bone_idx*8+3] = \
+      np.flip(np.array([0, 5, 2], dtype=np.int32), axis=0) + bone_idx * 6
+    faces[bone_idx*8+4] = \
+      np.flip(np.array([1, 4, 3], dtype=np.int32), axis=0) + bone_idx * 6
+    faces[bone_idx*8+5] = \
+      np.flip(np.array([1, 3, 2], dtype=np.int32), axis=0) + bone_idx * 6
+    faces[bone_idx*8+6] = \
+      np.flip(np.array([1, 5, 4], dtype=np.int32), axis=0) + bone_idx * 6
+    faces[bone_idx*8+7] = \
+      np.flip(np.array([1, 2, 5], dtype=np.int32), axis=0) + bone_idx * 6
 
   return verts, faces
 
@@ -145,7 +156,7 @@ def joints_to_mesh_cylinder(joints, parents, thickness=0.2):
   parents : list
     Parent joint of each child joint.
   thickness : float, optional
-    The thickness of the bone relative to length, by default 0.2
+    The size of the joint sphere relative to length, by default 0.2
 
   Returns
   -------
@@ -157,7 +168,7 @@ def joints_to_mesh_cylinder(joints, parents, thickness=0.2):
   faces = []
   verts = []
   v_cnt = 0
-
+  radius = None
   for c, p in enumerate(parents):
     if p is None:
       continue
@@ -167,7 +178,8 @@ def joints_to_mesh_cylinder(joints, parents, thickness=0.2):
     delta_len = np.linalg.norm(delta)
     delta_unit = delta / delta_len
 
-    radius = delta_len * thickness
+    if radius is None:
+      radius = delta_len * thickness / 2
     sphere = o3d.geometry.TriangleMesh.create_sphere(radius)
     s_verts = np.asarray(sphere.vertices)
     s_faces = np.asarray(sphere.triangles)

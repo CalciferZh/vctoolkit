@@ -88,7 +88,7 @@ def render_bones_from_uv(uv, canvas, parents, thickness=None):
     print('canvas must be uint8 type')
     exit(0)
   if thickness is None:
-    thickness = max(canvas.shape[0] // 128, 1)
+    thickness = int(max(round(canvas.shape[0] / 128), 1))
   for c, p in enumerate(parents):
     if p is None:
       continue
@@ -127,4 +127,3 @@ def render_bones_from_hmap(hmap, canvas, parents, thickness=None):
   coords = hmap_to_uv(hmap)
   bones = render_bones_from_uv(coords, canvas, parents, thickness)
   return bones
-

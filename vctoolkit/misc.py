@@ -269,3 +269,56 @@ def hmap_to_uv(hmap):
   v, h = np.unravel_index(np.argmax(hmap, 0), shape[:-1])
   coord = np.stack([v, h], 1)
   return coord
+
+
+def xyz_to_delta(xyz, parents, norm_delta):
+  """
+  Convert joint coordinates to bone orientations (delta).
+
+  Parameters
+  ----------
+  xyz : np.ndarray, shape [k, 3]
+    Joint coordinates.
+  parents : list
+    Parent for each joint.
+  norm_delta : bool
+    Wether normalize bone deltas.
+
+  Returns
+  -------
+  np.ndarray, [n, 3]
+    Bone orientations.
+  np.ndarray, [n, 1]
+    Bone lengths.
+  """
+  delta = np.zeros([len(parents), 3])
+  for c, p in enumerate(parents):
+    if p is None:
+      continue
+    else:
+      delta[c] = xyz[c] - xyz[p]
+  length = np.linalg.norm(delta, axis=-1, keepdims=True)
+  if norm_delta:
+    delta /= np.maximum(length, np.finfo(np.float32).eps)
+  return delta, length
+
+
+def camera_proj(k, xyz):
+  """
+  Camera projection: from camera space to image space.
+
+  Parameters
+  ----------
+  k : np.ndarray, shape [3, 3]
+    Camera intrinsics.
+  xyz : np.ndarray, shape [n, 3]
+    Coordinates.
+
+  Returns
+  -------
+  np.ndarray, shape [n, 2]
+    UV coordinates, (row, column)
+  """
+  uvd = np.dot(k, xyz.T)
+  uv = np.flip((uvd / uvd[2:3, :])[:2].T, -1).copy()
+  return uv
