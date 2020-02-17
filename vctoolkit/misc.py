@@ -324,7 +324,7 @@ def camera_proj(k, xyz):
   return uv
 
 
-def calculate_auc(xs, ys):
+def compute_auc(xs, ys):
   length = xs[-1] - xs[0]
   area = 0
   for i in range(len(ys) - 1):
