@@ -45,6 +45,9 @@ def pkl_load(path):
   return data
 
 
+load_pkl = pkl_load
+
+
 def pkl_save(path, data):
   """
   Save pickle data.
@@ -58,6 +61,9 @@ def pkl_save(path, data):
   """
   with open(path, 'wb') as f:
     pickle.dump(data, f)
+
+
+save_pkl = pkl_save
 
 
 def obj_save(path, vertices, faces=None):
@@ -81,6 +87,9 @@ def obj_save(path, vertices, faces=None):
         fp.write('f %d %d %d\n' % (f[0], f[1], f[2]))
 
 
+save_obj = obj_save
+
+
 def imread(path):
   """
   Read image.
@@ -98,6 +107,9 @@ def imread(path):
   return imageio.imread(path)
 
 
+load_img = imread
+
+
 def imsave(path, img):
   """
   Save image.
@@ -110,6 +122,9 @@ def imsave(path, img):
     Image to save.
   """
   imageio.imsave(path, img)
+
+
+save_img = imsave
 
 
 class VideoReader:
@@ -251,6 +266,9 @@ def ply_save_color_face(path, verts, faces, colors):
       )
 
 
+save_ply_color_face = ply_save_color_face
+
+
 def ply_save_color_pcloud(path, pcloud, color):
   """
   Save point cloud into a .ply file with per-point color.
@@ -282,73 +300,4 @@ def ply_save_color_pcloud(path, pcloud, color):
       f.write(b'%f %f %f %d %d %d\n' % (v[0], v[1], v[2], c[0], c[1], c[2]))
 
 
-def save_video_frames(size, video_path, save_prefix=None, fps=60):
-  """
-  Read video, display frame by frame, and save selected frames.
-
-  w: previous frame
-  s: next frame
-  a: revert
-  d: forward
-  q: quit
-  space: save this frame
-
-  Parameters
-  ----------
-  size : tuple
-    Screen size, (width, height)
-  video_path : str
-    Path to the video.
-  save_prefix : str, optional
-    Path prefix to save the frames, if None, will be the same as video_path,
-    by default None
-  fps : int, optional
-    Display framerate, by default 60
-  """
-  import pygame
-
-  if save_prefix is None:
-    save_prefix = video_path
-
-  pygame.init()
-  display = pygame.display.set_mode(size)
-  pygame.display.set_caption('loading')
-
-  reader = VideoReader(video_path)
-  frames = reader.all_frames()
-  reader.close()
-
-  idx = 0
-  done = False
-  clock = pygame.time.Clock()
-  while not done:
-    for event in pygame.event.get():
-      if event.type == pygame.QUIT:
-        done = True
-      elif event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_w:
-          idx -= 1
-        elif event.key == pygame.K_s:
-          idx += 1
-        elif event.key == pygame.K_SPACE:
-          imsave(video_path + '.frame%d' % idx + '.png')
-        elif event.key == pygame.K_q:
-          done = True
-    pressed = pygame.key.get_pressed()
-    if pressed[pygame.K_a]:
-      idx -= 1
-    if pressed[pygame.K_d]:
-      idx += 1
-
-    idx = min(max(idx, 0), len(frames) - 1)
-    pygame.display.set_caption('%s %d/%d' % video_path, idx, len(frames))
-    display.blit(
-      pygame.surfarray.make_surface(
-        imresize(frames[idx], size).transpose((1, 0, 2))
-      ), (0, 0)
-    )
-    pygame.display.update()
-
-    clock.tick(fps)
-
-  pkl_save(save_path, selected)
+save_ply_color_pcloud = ply_save_color_pcloud

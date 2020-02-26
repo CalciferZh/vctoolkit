@@ -163,3 +163,75 @@ def render_bones_plt(joints, parents):
     zs = [joints[c, 2], joints[p, 2]]
     plt.plot(xs, ys, zs, c=color_lib[p])
   plt.show()
+
+
+def save_selected_video_frames(size, video_path, save_prefix=None, fps=60):
+  """
+  Read video, display frame by frame, and save selected frames.
+
+  w: previous frame
+  s: next frame
+  a: revert
+  d: forward
+  q: quit
+  space: save this frame
+
+  Parameters
+  ----------
+  size : tuple
+    Screen size, (width, height)
+  video_path : str
+    Path to the video.
+  save_prefix : str, optional
+    Path prefix to save the frames, if None, will be the same as video_path,
+    by default None
+  fps : int, optional
+    Display framerate, by default 60
+  """
+  import pygame
+
+  if save_prefix is None:
+    save_prefix = video_path
+
+  pygame.init()
+  display = pygame.display.set_mode(size)
+  pygame.display.set_caption('loading')
+
+  reader = VideoReader(video_path)
+  frames = reader.all_frames()
+  reader.close()
+
+  idx = 0
+  done = False
+  clock = pygame.time.Clock()
+  while not done:
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        done = True
+      elif event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_w:
+          idx -= 1
+        elif event.key == pygame.K_s:
+          idx += 1
+        elif event.key == pygame.K_SPACE:
+          imsave(video_path + '.frame%d' % idx + '.png')
+        elif event.key == pygame.K_q:
+          done = True
+    pressed = pygame.key.get_pressed()
+    if pressed[pygame.K_a]:
+      idx -= 1
+    if pressed[pygame.K_d]:
+      idx += 1
+
+    idx = min(max(idx, 0), len(frames) - 1)
+    pygame.display.set_caption('%s %d/%d' % video_path, idx, len(frames))
+    display.blit(
+      pygame.surfarray.make_surface(
+        imresize(frames[idx], size).transpose((1, 0, 2))
+      ), (0, 0)
+    )
+    pygame.display.update()
+
+    clock.tick(fps)
+
+  pkl_save(save_path, selected)
