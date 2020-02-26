@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import time
+import uuid as uuid_import
 
 
 color_lib = [
@@ -372,3 +373,7 @@ def compute_pck(errors, thres_range, n_step):
   for x in xs:
     ys.append(np.sum(errors < x) / errors.shape[0])
   return xs, ys
+
+
+def uuid():
+  return uuid_import.uuid4()

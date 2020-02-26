@@ -2,11 +2,50 @@ import pickle
 import imageio
 import cv2
 import numpy as np
-import uuid
+import h5py
 from .misc import imresize
 
 
-def read_all_lines(path):
+def save_hdf5(path, data):
+  """
+  Save data into hdf5 format. If any data is string in a numpy array, make sure
+  set the dtype to 'S'.
+
+  Parameters
+  ----------
+  path : str
+    Path to save the data.
+  data : dict
+    Keys and data.
+  """
+  f = h5py.File(path, 'w')
+  for k, v in data.items():
+    f.create_dataset(k, v.shape, data=v)
+  f.close()
+
+
+def load_hdf5(path):
+  """
+  Load data from hdf5 file.
+
+  Parameters
+  ----------
+  path : str
+    Path to the file.
+
+  Returns
+  -------
+  dict
+    Data.
+  """
+  f = h5py.File(path, 'r')
+  data = {}
+  for k in f.keys():
+    data[k] = np.array(f[k])
+  return data
+
+
+def load_txt(path):
   """
   Read all lines from a text file.
 
