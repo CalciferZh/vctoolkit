@@ -346,7 +346,7 @@ def camera_intrinsic(fx, fy, tx, ty):
   np.ndarray, shape [3, 3]
     Camear intrinsic matrix (placed on left).
   """
-  return np.array([[fx, 0, u], [0, fy, v], [0, 0, 1]])
+  return np.array([[fx, 0, tx], [0, fy, ty], [0, 0, 1]])
 
 
 def compute_auc(xs, ys):
