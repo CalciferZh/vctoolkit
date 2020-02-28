@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import time
 import uuid as uuid_import
+import transforms3d
 
 
 color_lib = [
@@ -325,6 +326,29 @@ def camera_proj(k, xyz):
   return uv
 
 
+def camera_intrinsic(fx, fy, tx, ty):
+  """
+  Convert camera parameters into camera intrinsic matrix.
+
+  Parameters
+  ----------
+  fx : float
+    fx.
+  fy : float
+    fy
+  tx : float
+    tx
+  ty : float
+    ty
+
+  Returns
+  -------
+  np.ndarray, shape [3, 3]
+    Camear intrinsic matrix (placed on left).
+  """
+  return np.array([[fx, 0, u], [0, fy, v], [0, 0, 1]])
+
+
 def compute_auc(xs, ys):
   """
   Compute area under curve (AuC).
@@ -376,4 +400,31 @@ def compute_pck(errors, thres_range, n_step):
 
 
 def uuid():
+  """
+  Get a random string.
+
+  Returns
+  -------
+  str
+    Random string.
+  """
   return uuid_import.uuid4()
+
+
+def axangle_to_mat(vec):
+  """
+  Convert axis-angle rotation vector into rotation matrix.
+
+  Parameters
+  ----------
+  vec : np.ndarray, shape [3]
+    Rotation vector.
+
+  Returns
+  -------
+  np.ndarray, shape [3, 3]
+    Rotation matrix.
+  """
+  angle = np.linalg.norm(vec)
+  axis = vec / angle
+  return transforms3d.axangles.axangle2mat(axis, angle)

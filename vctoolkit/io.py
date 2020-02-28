@@ -6,6 +6,23 @@ import h5py
 from .misc import imresize
 
 
+def load_mat(path):
+  """
+  Load matlab .mat data.
+
+  Parameters
+  ----------
+  path : str
+    Path to data.
+
+  Returns
+  -------
+  obj
+    Data.
+  """
+  return scipy.io.loadmat(path)
+
+
 def save_hdf5(path, data):
   """
   Save data into hdf5 format. If any data is string in a numpy array, make sure
