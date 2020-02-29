@@ -180,12 +180,12 @@ def hmap_to_uv(hmap):
 
   Returns
   -------
-  tensor, shape [n, 2]
+  tensor, shape [n, c, 2]
     UV coordinates, order (row, column).
   """
   hmap_flat = tf.reshape(hmap, (tf.shape(hmap)[0], -1, tf.shape(hmap)[3]))
   argmax = tf.argmax(hmap_flat, axis=1, output_type=tf.int32)
   argmax_r = argmax // tf.shape(hmap)[2]
   argmax_c = argmax % tf.shape(hmap)[2]
-  uv = tf.stack([argmax_r, argmax_c], axis=1)
+  uv = tf.stack([argmax_r, argmax_c], axis=2)
   return uv
