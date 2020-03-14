@@ -12,6 +12,8 @@ class TriMeshViewer:
   """
   Render and visualize a triangle mesh with animation. See `TriMeshViewer.run`.
 
+  Call `run()` to set up meshes and run.
+
   num-pad 5: reset view.
   space: play / pause.
   d: revert.

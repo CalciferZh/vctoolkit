@@ -1,10 +1,12 @@
 import pickle
-import imageio
+
 import cv2
-import numpy as np
 import h5py
-from .misc import imresize
+import imageio
+import numpy as np
 import scipy.io
+
+from .misc import imresize
 
 
 def load_mat(path):
@@ -187,6 +189,11 @@ save_img = imsave
 class VideoReader:
   """
   Read frames from video.
+
+  Call `next_frame` to read next frame.
+  Call `all_frames` to read all remaining frames.
+  Call `close` to release resource.
+
   """
   def __init__(self, path):
     """
@@ -246,6 +253,10 @@ class VideoReader:
 class VideoWriter:
   """
   Write frames to a video.
+
+  Call `write_frame` to write a single frame.
+  Call `close` to release resource.
+
   """
   def __init__(self, path, width, height, fps):
     """

@@ -155,6 +155,9 @@ def arr_identical(a, b, verbose=True):
 class Timer:
   """
   Timer to evaluate passed time.
+
+  Call `tic` to save current time.
+
   """
   def __init__(self):
     self.last_tic = 0
@@ -187,6 +190,9 @@ class Timer:
 class LowPassFilter:
   """
   Lowpass filter. s = a * s + (1 - a) * s'
+
+  Call 'process` to filter one signal.
+
   """
   def __init__(self, alpha=0.9):
     self.prev_raw_value = None
@@ -219,6 +225,11 @@ class LowPassFilter:
 
 
 class OneEuroFilter:
+  """
+  One euro filter.
+
+  Call `process` to process the signal.
+  """
   def __init__(self, mincutoff=1.0, beta=0.0, dcutoff=1.0, freq=30):
     """
     Parameters
@@ -228,9 +239,9 @@ class OneEuroFilter:
     beta : float, optional
       Increase beta to decrease speed lag, by default 0.0
     dcutoff : float, optional
-        [description], by default 1.0
+      by default 1.0
     freq : int, optional
-        [description], by default 30
+      by default 30
     """
     self.freq = freq
     self.mincutoff = mincutoff
