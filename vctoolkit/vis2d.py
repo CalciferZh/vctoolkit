@@ -32,7 +32,7 @@ def imshow(img):
   plt.show()
 
 
-def imshow_grid(imgs, nrows, ncols):
+def imshow_grid(imgs, nrows, ncols, save_path=None):
   """
   Display multiple images as a grid.
 
@@ -50,9 +50,12 @@ def imshow_grid(imgs, nrows, ncols):
     fig.add_subplot(nrows, ncols, i+1)
     plt.imshow(img)
   plt.show()
+  if save_path is not None:
+    plt.savefig()
 
 
-def imshow_onerow(imgs):
+
+def imshow_onerow(imgs, save_path=None):
   """
   Display images in one row.
 
@@ -61,7 +64,7 @@ def imshow_onerow(imgs):
   imgs : list
     List of images to be displayed.
   """
-  imshow_grid(imgs, 1, len(imgs))
+  imshow_grid(imgs, 1, len(imgs), save_path)
 
 
 def render_bones_from_uv(uv, canvas, parents, thickness=None):
