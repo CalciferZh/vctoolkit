@@ -51,8 +51,7 @@ def imshow_grid(imgs, nrows, ncols, save_path=None):
     plt.imshow(img)
   plt.show()
   if save_path is not None:
-    plt.savefig()
-
+    plt.savefig(save_path)
 
 
 def imshow_onerow(imgs, save_path=None):
