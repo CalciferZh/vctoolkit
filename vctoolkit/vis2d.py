@@ -94,7 +94,7 @@ def render_bones_from_uv(uv, canvas, parents, thickness=None):
   for c, p in enumerate(parents):
     if p is None:
       continue
-    color = color_lib[p]
+    color = color_lib[p % len(color_lib)]
     start = (int(uv[p][1]), int(uv[p][0]))
     end = (int(uv[c][1]), int(uv[c][0]))
 
@@ -163,7 +163,7 @@ def render_bones_plt(joints, parents):
     xs = [joints[c, 0], joints[p, 0]]
     ys = [joints[c, 1], joints[p, 1]]
     zs = [joints[c, 2], joints[p, 2]]
-    plt.plot(xs, ys, zs, c=color_lib[p])
+    plt.plot(xs, ys, zs, c=color_lib[p % len(color_lib)])
   plt.show()
 
 
