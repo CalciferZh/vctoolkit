@@ -144,7 +144,7 @@ def joints_to_mesh_prism(joints, parents, thickness=0.2):
   return verts, faces
 
 
-def joints_to_mesh_cylinder(joints, parents, thickness=0.2):
+def joints_to_mesh_cylinder(joints, parents, thickness=1.0):
   """
   Produce a mesh representing the skeleton with given joint coordinates.
   Bones are represented by cylinders and joints spheres.
@@ -180,14 +180,14 @@ def joints_to_mesh_cylinder(joints, parents, thickness=0.2):
 
     if radius is None:
       radius = delta_len * thickness / 2
-    sphere = o3d.geometry.TriangleMesh.create_sphere(radius)
+    sphere = o3d.geometry.TriangleMesh.create_sphere(radius, resolution=16)
     s_verts = np.asarray(sphere.vertices)
     s_faces = np.asarray(sphere.triangles)
 
     # bone cylinder
 
     cylinder = o3d.geometry.TriangleMesh.create_cylinder(
-      radius / 2, height=delta_len, split=1
+      radius / 2, height=delta_len, split=1, resolution=16
     )
     c_verts = np.asarray(cylinder.vertices) + np.array([0, 0, delta_len / 2])
     c_faces = np.asarray(cylinder.triangles)

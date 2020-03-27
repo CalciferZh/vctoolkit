@@ -140,9 +140,11 @@ def obj_save(path, vertices, faces=None):
   """
   with open(path, 'w') as fp:
     for v in vertices:
+      v = np.ravel(v)
       fp.write('v %f %f %f\n' % (v[0], v[1], v[2]))
     if faces is not None:
       for f in faces + 1:
+        f = np.ravel(f)
         fp.write('f %d %d %d\n' % (f[0], f[1], f[2]))
 
 
