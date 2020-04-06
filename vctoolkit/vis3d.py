@@ -62,7 +62,7 @@ def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
   for v in tqdm(verts, ascii=True):
     mesh.vertices = o3d.utility.Vector3dVector(v)
     mesh.compute_vertex_normals()
-    vis.update_geometry()
+    vis.update_geometry(mesh)
     vis.poll_events()
     vis.update_renderer()
     frame = (np.asarray(vis.capture_screen_float_buffer()) * 255).astype(np.uint8)
