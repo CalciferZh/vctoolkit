@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from .misc import *
+from .io import *
 
 
 def imshow_cv(img, caption='OpenCV Image Show'):
@@ -167,7 +168,7 @@ def render_bones_plt(joints, parents):
   plt.show()
 
 
-def save_selected_video_frames(size, video_path, save_prefix=None, fps=60):
+def select_frames_from_video(video_path, save_prefix=None, fps=60, scale=1):
   """
   Read video, display frame by frame, and save selected frames.
 
@@ -180,8 +181,6 @@ def save_selected_video_frames(size, video_path, save_prefix=None, fps=60):
 
   Parameters
   ----------
-  size : tuple
-    Screen size, (width, height)
   video_path : str
     Path to the video.
   save_prefix : str, optional
@@ -189,19 +188,24 @@ def save_selected_video_frames(size, video_path, save_prefix=None, fps=60):
     by default None
   fps : int, optional
     Display framerate, by default 60
+  scale : float
+    Display scale of the video frames, by default 1
   """
   import pygame
 
   if save_prefix is None:
     save_prefix = video_path
 
-  pygame.init()
-  display = pygame.display.set_mode(size)
-  pygame.display.set_caption('loading')
-
   reader = VideoReader(video_path)
   frames = reader.all_frames()
   reader.close()
+
+  display_size = \
+    (int(frames[0].shape[1] * scale), int(frames[0].shape[0] * scale))
+
+  pygame.init()
+  display = pygame.display.set_mode(display_size)
+  pygame.display.set_caption('loading')
 
   idx = 0
   done = False
@@ -216,7 +220,7 @@ def save_selected_video_frames(size, video_path, save_prefix=None, fps=60):
         elif event.key == pygame.K_s:
           idx += 1
         elif event.key == pygame.K_SPACE:
-          imsave(video_path + '.frame%d' % idx + '.png')
+          imsave('./frame_%d' % idx + '.png')
         elif event.key == pygame.K_q:
           done = True
     pressed = pygame.key.get_pressed()
@@ -229,7 +233,7 @@ def save_selected_video_frames(size, video_path, save_prefix=None, fps=60):
     pygame.display.set_caption('%s %d/%d' % video_path, idx, len(frames))
     display.blit(
       pygame.surfarray.make_surface(
-        imresize(frames[idx], size).transpose((1, 0, 2))
+        imresize(frames[idx], display_size).transpose((1, 0, 2))
       ), (0, 0)
     )
     pygame.display.update()
