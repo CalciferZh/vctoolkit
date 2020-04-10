@@ -230,7 +230,7 @@ def select_frames_from_video(video_path, save_prefix=None, fps=60, scale=1):
       idx += 1
 
     idx = min(max(idx, 0), len(frames) - 1)
-    pygame.display.set_caption('%s %d/%d' % video_path, idx, len(frames))
+    pygame.display.set_caption('%s %d/%d' % (video_path, idx, len(frames)))
     display.blit(
       pygame.surfarray.make_surface(
         imresize(frames[idx], display_size).transpose((1, 0, 2))
@@ -239,5 +239,3 @@ def select_frames_from_video(video_path, save_prefix=None, fps=60, scale=1):
     pygame.display.update()
 
     clock.tick(fps)
-
-  pkl_save(save_path, selected)
