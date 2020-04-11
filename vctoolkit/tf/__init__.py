@@ -142,6 +142,8 @@ def resnet50(inputs, scope, training, squeeze):
     Variable scope.
   training : bool
     Training or not.
+  squeeze: bool
+    Squeeze 1024 channels to 256 channels in the end, or not.
 
   Returns
   -------
