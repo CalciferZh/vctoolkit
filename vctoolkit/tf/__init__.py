@@ -130,7 +130,7 @@ def bottleneck(inputs, oc, st, scope, training, rate=1):
   return output
 
 
-def resnet50(inputs, scope, training):
+def resnet50(inputs, scope, training, squeeze):
   """
   ResNet 50.
 
@@ -164,7 +164,8 @@ def resnet50(inputs, scope, training):
       for unit in range(6):
         layer = bottleneck(layer, 1024, 1, 'unit%d' % (unit + 1), training, 4)
 
-    layer = conv_bn_relu(layer, 256, 3, 1, 'squeeze', training)
+    if squeeze:
+      layer = conv_bn_relu(layer, 256, 3, 1, 'squeeze', training)
 
   return layer
 
