@@ -1,4 +1,5 @@
 import pickle
+import json
 
 import cv2
 import h5py
@@ -7,6 +8,40 @@ import numpy as np
 import scipy.io
 
 from .misc import imresize
+
+
+def load_json(path):
+  """
+  Load json data from file.
+
+  Parameters
+  ----------
+  path : str
+    Path to the json file.
+
+  Returns
+  -------
+  dict
+    Json data.
+  """
+  with open(path) as f:
+    data = json.load(f)
+  return data
+
+
+def save_json(path, data):
+  """
+  Save dict data into json file.
+
+  Parameters
+  ----------
+  path : str
+    Path to save.
+  data : dict
+    Data to save.
+  """
+  with open(path, 'w') as f:
+    f.write(json.dumps(data))
 
 
 def load_mat(path):

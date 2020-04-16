@@ -301,3 +301,6 @@ def vis_mesh(verts, faces, width=1080, height=1080):
   viewer.create_window(width=width, height=height, visible=True)
   viewer.add_geometry(mesh)
   viewer.run()
+
+
+show_mesh = vis_mesh
