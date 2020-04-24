@@ -21,7 +21,7 @@ def load_json(path):
 
   Returns
   -------
-  dict
+  dict or list
     Json data.
   """
   with open(path) as f:
@@ -37,7 +37,7 @@ def save_json(path, data):
   ----------
   path : str
     Path to save.
-  data : dict
+  data : dict or list
     Data to save.
   """
   with open(path, 'w') as f:
@@ -244,6 +244,7 @@ class VideoReader:
     self.width = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
     self.height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
     self.n_frames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT)) + 1
+    self.frame_idx = 0
 
   def next_frame(self):
     """
@@ -257,6 +258,7 @@ class VideoReader:
     if not self.video.isOpened():
       return None
     ret, frame = self.video.read()
+    self.frame_idx += 1
     if not ret:
       return None
     frame = np.flip(frame, axis=-1).copy()
@@ -274,6 +276,7 @@ class VideoReader:
     frames = []
     while self.video.isOpened():
       ret, frame = self.video.read()
+      self.frame_idx += 1
       if not ret:
         break
       frame = np.flip(frame, axis=-1).copy()
@@ -311,6 +314,7 @@ class VideoWriter:
     self.video = cv2.VideoWriter(
       path, cv2.VideoWriter_fourcc(*'H264'), fps, (width, height)
     )
+    self.frame_idx = 0
 
   def write_frame(self, frame):
     """
@@ -322,6 +326,7 @@ class VideoWriter:
       Frame to write.
     """
     self.video.write(np.flip(frame, axis=-1).copy())
+    self.frame_idx += 1
 
   def close(self):
     """
