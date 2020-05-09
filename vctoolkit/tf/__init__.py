@@ -19,6 +19,37 @@ def tensor_shape(t):
   return t.get_shape().as_list()
 
 
+def conv(inputs, oc, ks, st, rate=1):
+  """
+  Convolution - batch normalization.
+
+  Parameters
+  ----------
+  inputs : tensor
+    Input tensor.
+  oc : int
+    Number of output channels.
+  ks : int
+    Kernel size.
+  st : int
+    Stride.
+  rate : int, optional
+    Dilation rate, by default 1
+
+  Returns
+  -------
+  tensor
+    Output tensor.
+  """
+  layer = tf.layers.conv2d(
+    inputs, oc, ks, strides=st, padding='SAME', use_bias=False,
+    dilation_rate=rate,
+    kernel_regularizer=tf.contrib.layers.l2_regularizer(1.0),
+    kernel_initializer=tf.contrib.layers.xavier_initializer()
+  )
+  return layer
+
+
 def conv_bn(inputs, oc, ks, st, scope, training, rate=1):
   """
   Convolution - batch normalization.
@@ -46,12 +77,7 @@ def conv_bn(inputs, oc, ks, st, scope, training, rate=1):
     Output tensor.
   """
   with tf.variable_scope(scope):
-    layer = tf.layers.conv2d(
-      inputs, oc, ks, strides=st, padding='SAME', use_bias=False,
-      dilation_rate=rate,
-      kernel_regularizer=tf.contrib.layers.l2_regularizer(1.0),
-      kernel_initializer=tf.contrib.layers.xavier_initializer()
-    )
+    layer = conv(inputs, oc, ks, st, rate)
     layer = tf.layers.batch_normalization(layer, training=training)
   return layer
 
@@ -84,6 +110,22 @@ def conv_bn_relu(inputs, oc, ks, st, scope, training, rate=1):
   """
   layer = conv_bn(inputs, oc, ks, st, scope, training, rate=rate)
   layer = tf.nn.relu(layer)
+  return layer
+
+
+def dense(layer, n_units):
+  layer = tf.layers.dense(
+    layer, n_units, activation=None,
+    kernel_regularizer=tf.contrib.layers.l2_regularizer(1.0),
+    kernel_initializer=tf.initializers.truncated_normal(stddev=0.01)
+  )
+  return layer
+
+
+def dense_bn(layer, n_units, scope, training):
+  with tf.variable_scope(scope):
+    layer = dense(layer, n_units)
+    layer = tf.layers.batch_normalization(layer, training=training)
   return layer
 
 
