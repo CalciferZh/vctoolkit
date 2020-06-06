@@ -229,6 +229,17 @@ class OneEuroFilter:
   One euro filter.
 
   Call `process` to process the signal.
+
+  Parameters
+  ----------
+  mincutoff : float, optional
+    Decrease mincutoff to decrease slow speed jittering, by default 1.0
+  beta : float, optional
+    Increase beta to decrease speed lag, by default 0.0
+  dcutoff : float, optional
+    by default 1.0
+  freq : int, optional
+    by default 30
   """
   def __init__(self, mincutoff=1.0, beta=0.0, dcutoff=1.0, freq=30):
     """
