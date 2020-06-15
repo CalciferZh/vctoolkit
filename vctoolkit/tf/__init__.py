@@ -172,7 +172,7 @@ def bottleneck(inputs, oc, st, scope, training, rate=1):
   return output
 
 
-def resnet50(inputs, scope, training, squeeze):
+def resnet50(inputs, scope, training, squeeze, internal_layer=False):
   """
   ResNet 50.
 
@@ -186,11 +186,14 @@ def resnet50(inputs, scope, training, squeeze):
     Training or not.
   squeeze: bool
     Squeeze 1024 channels to 256 channels in the end, or not.
+  internal_layer:
+    Wether to return the 2x downsampled internal feature layer.
 
   Returns
   -------
   tensor
-    Output tensor.
+    Output tensor. If `internal_layer == True`, will also return that layer as
+    the second return value.
   """
   with tf.variable_scope(scope):
     layer = conv_bn_relu(inputs, 64, 7, 2, 'conv1', training)
@@ -198,6 +201,7 @@ def resnet50(inputs, scope, training, squeeze):
     with tf.variable_scope('block1'):
       for unit in range(2):
         layer = bottleneck(layer, 256, 1, 'unit%d' % (unit + 1), training)
+      layer2 = layer
       layer = bottleneck(layer, 256, 2, 'unit3', training)
 
     with tf.variable_scope('block2'):
@@ -210,6 +214,9 @@ def resnet50(inputs, scope, training, squeeze):
 
     if squeeze:
       layer = conv_bn_relu(layer, 256, 3, 1, 'squeeze', training)
+
+  if internal_layer:
+    return layer, layer2
 
   return layer
 
