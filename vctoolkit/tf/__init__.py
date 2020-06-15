@@ -21,7 +21,7 @@ def tensor_shape(t):
 
 def conv(inputs, oc, ks, st, rate=1):
   """
-  Convolution - batch normalization.
+  Convolution.
 
   Parameters
   ----------
@@ -109,6 +109,93 @@ def conv_bn_relu(inputs, oc, ks, st, scope, training, rate=1):
     Output tensor.
   """
   layer = conv_bn(inputs, oc, ks, st, scope, training, rate=rate)
+  layer = tf.nn.relu(layer)
+  return layer
+
+
+def deconv(inputs, oc, ks, st):
+  """
+  Deconvolution.
+
+  Parameters
+  ----------
+  inputs : tensor
+    Input tensor.
+  oc : int
+    Number of output channels.
+  ks : int
+    Kernel size.
+  st : int
+    Stride.
+
+  Returns
+  -------
+  tensor
+    Output tensor.
+  """
+  layer = tf.layers.conv2d_transpose(
+    inputs, oc, ks, st, padding='SAME', use_bias=False,
+    kernel_initializer=tf.contrib.layers.xavier_initializer(),
+    kernel_regularizer=tf.contrib.layers.l2_regularizer(1.0),
+  )
+  return layer
+
+
+def deconv_bn(inputs, oc, ks, st, scope, training):
+  """
+  Deconvolution - batch normalization.
+
+  Parameters
+  ----------
+  inputs : tensor
+    Input tensor.
+  oc : int
+    Number of output channels.
+  ks : int
+    Kernel size.
+  st : int
+    Stride.
+  scope : str
+    Variable scope.
+  training : bool
+    Is training or not.
+
+  Returns
+  -------
+  tensor
+    Output tensor.
+  """
+  with tf.variable_scope(scope):
+    layer = deconv(inputs, oc, ks, st)
+    layer = tf.layers.batch_normalization(layer, training=training)
+  return layer
+
+
+def deconv_bn_relu(inputs, oc, ks, st, scope, training):
+  """
+  Deconvolution - batch normalization - relu.
+
+  Parameters
+  ----------
+  inputs : tensor
+    Input tensor.
+  oc : int
+    Number of output channels.
+  ks : int
+    Kernel size.
+  st : int
+    Stride.
+  scope : str
+    Variable scope.
+  training : bool
+    Training or not.
+
+  Returns
+  -------
+  tensor
+    Output tensor.
+  """
+  layer = deconv_bn(inputs, oc, ks, st, scope, training)
   layer = tf.nn.relu(layer)
   return layer
 
