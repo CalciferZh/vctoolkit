@@ -454,4 +454,4 @@ def axangle_to_mat(vec):
 
 
 def progress_bar(repeat):
-  return tqdm(list(range(repeat)), ascii=True)
+  return tqdm.tqdm(list(range(repeat)), ascii=True)
