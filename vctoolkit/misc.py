@@ -3,6 +3,7 @@ import cv2
 import time
 import uuid as uuid_import
 import transforms3d
+import tqdm
 
 
 color_lib = [
@@ -450,3 +451,7 @@ def axangle_to_mat(vec):
   angle = np.linalg.norm(vec)
   axis = vec / angle
   return transforms3d.axangles.axangle2mat(axis, angle)
+
+
+def progress_bar(repeat):
+  return tqdm(list(range(repeat)), ascii=True)
