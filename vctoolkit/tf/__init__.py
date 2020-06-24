@@ -291,11 +291,11 @@ def resnet50(inputs, scope, training, squeeze, size=[3, 4, 6]):
       layer = bottleneck(layer, 256, 2, 'unit3', training)
 
     with tf.variable_scope('block2'):
-      for unit in range(size[1] - 1):
+      for unit in range(size[1]):
         layer = bottleneck(layer, 512, 1, 'unit%d' % (unit + 1), training, 2)
 
     with tf.variable_scope('block3'):
-      for unit in range(size[2] - 1):
+      for unit in range(size[2]):
         layer = bottleneck(layer, 1024, 1, 'unit%d' % (unit + 1), training, 4)
 
     if squeeze:
