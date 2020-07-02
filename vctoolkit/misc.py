@@ -328,6 +328,45 @@ def xyz_to_delta(xyz, parents, norm_delta):
   return delta, length
 
 
+def delta_to_xyz(delta, parents, length=None):
+  """
+  Convert bone orientations to joint coordinates.
+
+  Parameters
+  ----------
+  delta : np.ndarray, shape [k, 3]
+    Bone orientations.
+  parents : list
+    Parent for each joint.
+  length : list or None
+    The length of each bone (if delta are unit vectors), or None.
+
+  Returns
+  -------
+  np.ndarray, [n, 3]
+    Joint coordinates.
+  """
+  if length is None:
+    length = np.ones(len(parents))
+
+  xyz = [None] * len(parents)
+  done = False
+  while not done:
+    done = True
+    for c, p in enumerate(parents):
+      if xyz[c] is not None:
+        continue
+      if p is None:
+        xyz[c] = delta[c] * length[c]
+      else:
+        if xyz[p] is None:
+          done = False
+        else:
+          xyz[c] = xyz[p] + delta[c] * length[c]
+  xyz = np.stack(xyz, 0)
+  return xyz
+
+
 def camera_proj(k, xyz):
   """
   Camera projection: from camera space to image space.
@@ -434,7 +473,7 @@ def uuid():
   return uuid_import.uuid4()
 
 
-def axangle_to_mat(vec):
+def axangle_to_rotmat(vec):
   """
   Convert axis-angle rotation vector into rotation matrix.
 
