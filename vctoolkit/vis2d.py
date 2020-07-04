@@ -67,7 +67,7 @@ def imshow_onerow(imgs, save_path=None):
   imshow_grid(imgs, 1, len(imgs), save_path)
 
 
-def render_bones_from_uv(uv, canvas, parents, thickness=None):
+def render_bones_from_uv(uv, canvas, parents, color=None, thickness=None):
   """
   Render bones from joint uv coordinates.
 
@@ -79,6 +79,8 @@ def render_bones_from_uv(uv, canvas, parents, thickness=None):
     Canvas to draw on.
   parents : list
     The parent joint for each joint. Root joint's parent should be None.
+  color : list
+    Color for each bone. A list of list in range [0, 255].
   thickness : int, optional
     Thickness of the line, by default None
 
@@ -95,7 +97,10 @@ def render_bones_from_uv(uv, canvas, parents, thickness=None):
   for c, p in enumerate(parents):
     if p is None:
       continue
-    color = color_lib[p % len(color_lib)]
+    if color is None:
+      c = color_lib[c % len(color_lib)]
+    else:
+      c = color[c]
     start = (int(uv[p][1]), int(uv[p][0]))
     end = (int(uv[c][1]), int(uv[c][0]))
 
@@ -103,11 +108,11 @@ def render_bones_from_uv(uv, canvas, parents, thickness=None):
     if anyzero(start) or anyzero(end):
       continue
 
-    cv2.line(canvas, start, end, color, thickness)
+    cv2.line(canvas, start, end, c, thickness)
   return canvas
 
 
-def render_bones_from_hmap(hmap, canvas, parents, thickness=None):
+def render_bones_from_hmap(hmap, canvas, parents, color=None, thickness=None):
   """
   Render bones from heat maps.
 
@@ -128,7 +133,7 @@ def render_bones_from_hmap(hmap, canvas, parents, thickness=None):
     Canvas after rendering.
   """
   coords = hmap_to_uv(hmap)
-  bones = render_bones_from_uv(coords, canvas, parents, thickness)
+  bones = render_bones_from_uv(coords, canvas, parents, color, thickness)
   return bones
 
 

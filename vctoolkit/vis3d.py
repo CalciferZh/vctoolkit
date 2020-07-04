@@ -71,7 +71,7 @@ def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
   writer.close()
 
 
-def joints_to_mesh_prism(joints, parents, thickness=0.2):
+def joints_to_mesh_prism(joints, parents, color=None, thickness=0.2):
   """
   Produce a mesh representing the skeleton with given joint coordinates.
   Bones are represented by prisms.
@@ -82,6 +82,8 @@ def joints_to_mesh_prism(joints, parents, thickness=0.2):
     Joint coordinates.
   parents : list
     Parent joint of each child joint.
+  color : list
+    Color for each bone. A list of list in range [0, 255].
   thickness : float, optional
     The thickness of the bone relative to length, by default 0.2
 
@@ -95,6 +97,7 @@ def joints_to_mesh_prism(joints, parents, thickness=0.2):
   n_bones = len(list(filter(lambda x: x is not None, parents)))
   faces = np.empty([n_bones * 8, 3], dtype=np.int32)
   verts = np.empty([n_bones * 6, 3], dtype=np.float32)
+  face_color = []
   bone_idx = -1
   for child, parent in enumerate(parents):
     if parent is None:
@@ -140,6 +143,13 @@ def joints_to_mesh_prism(joints, parents, thickness=0.2):
       np.flip(np.array([1, 5, 4], dtype=np.int32), axis=0) + bone_idx * 6
     faces[bone_idx*8+7] = \
       np.flip(np.array([1, 2, 5], dtype=np.int32), axis=0) + bone_idx * 6
+
+    if color is not None:
+      for _ in range(7):
+        face_color.append(color[child])
+
+  if color is not None:
+    return verts, faces, face_color
 
   return verts, faces
 
