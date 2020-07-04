@@ -145,7 +145,7 @@ def joints_to_mesh_prism(joints, parents, color=None, thickness=0.2):
       np.flip(np.array([1, 2, 5], dtype=np.int32), axis=0) + bone_idx * 6
 
     if color is not None:
-      for _ in range(7):
+      for _ in range(8):
         face_color.append(color[child])
 
   if color is not None:
