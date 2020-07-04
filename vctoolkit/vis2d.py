@@ -94,15 +94,15 @@ def render_bones_from_uv(uv, canvas, parents, color=None, thickness=None):
     exit(0)
   if thickness is None:
     thickness = int(max(round(canvas.shape[0] / 128), 1))
-  for c, p in enumerate(parents):
-    if p is None:
+  for child, parent in enumerate(parents):
+    if parent is None:
       continue
     if color is None:
-      c = color_lib[c % len(color_lib)]
+      c = color_lib[child % len(color_lib)]
     else:
-      c = color[c]
-    start = (int(uv[p][1]), int(uv[p][0]))
-    end = (int(uv[c][1]), int(uv[c][0]))
+      c = color[child]
+    start = (int(uv[parent][1]), int(uv[parent][0]))
+    end = (int(uv[child][1]), int(uv[child][0]))
 
     anyzero = lambda x: x[0] * x[1] == 0
     if anyzero(start) or anyzero(end):
