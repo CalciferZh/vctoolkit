@@ -261,9 +261,9 @@ def joints_to_mesh(joints, parents, style='prism', thickness=0.2):
     Face indices of the mesh.
   """
   if style == 'prism':
-    return joints_to_mesh_prism(joints, parents, thickness)
+    return joints_to_mesh_prism(joints, parents, thickness=thickness)
   elif style == 'cylinder':
-    return joints_to_mesh_cylinder(joints, parents, thickness)
+    return joints_to_mesh_cylinder(joints, parents, thickness=thickness)
   else:
     raise RuntimeError('Invalid style: ' % style)
 
