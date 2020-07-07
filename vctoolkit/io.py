@@ -7,8 +7,6 @@ import imageio
 import numpy as np
 import scipy.io
 
-from .misc import imresize
-
 
 def load_json(path):
   """

@@ -6,6 +6,8 @@ import transforms3d
 import tqdm
 import os
 
+from .io import load_hdf5
+
 
 color_lib = [
   [255, 0, 0], [230, 25, 75], [60, 180, 75], [255, 225, 25],
@@ -495,7 +497,6 @@ def axangle_to_rotmat(vec):
 
 def progress_bar(repeat):
   return tqdm.tqdm(list(range(repeat)), ascii=True)
-
 
 
 class ParallelReader:
