@@ -4,6 +4,7 @@ import time
 import uuid as uuid_import
 import transforms3d
 import tqdm
+import os
 
 
 color_lib = [
@@ -494,3 +495,113 @@ def axangle_to_rotmat(vec):
 
 def progress_bar(repeat):
   return tqdm.tqdm(list(range(repeat)), ascii=True)
+
+
+
+class ParallelReader:
+  def __init__(self, readers):
+    """
+    Always return the batch data of every reader concatenated along axis 0.
+
+    Parameters
+    ----------
+    readers : list
+      List of readers.
+    """
+    self.readers = readers
+    self.batch_size = sum([r.batch_size for r in readers], 0)
+
+  def next_batch(self):
+    packs = [r.next_batch() for r in self.readers]
+    batch_data = {}
+
+    for k in packs[0].keys():
+      batch_data[k] = np.concatenate([p[k] for p in packs], 0)
+    return batch_data
+
+
+class CascadeReader:
+  def __init__(self, readers):
+    """
+    Always return the batch data of only one reader from the readers.
+
+    Parameters
+    ----------
+    readers : list
+      List of readers.
+    """
+    self.readers = readers
+    self.batch_size = readers[0].batch_size
+    self.reader_idx = 0
+
+  def next_batch(self):
+    if self.reader_idx == len(self.readers):
+      self.reader_idx = 0
+    return self.readers[self.reader_idx].next_batch()
+
+
+class DataLoader:
+  def __init__(self, data_dir, batch_size):
+    """
+    Data loader to load all data from the data dir.
+
+    Parameters
+    ----------
+    data_dir : str
+      Data folder.
+    batch_size : int
+      Batch size.
+    """
+    print_important('Data loader at %s, batch size %d.' % (data_dir, batch_size))
+    self.data_dir = data_dir
+    self.data_files = os.listdir(self.data_dir)
+    self.data_file_idx = 0
+    self.cache_idx = 0
+    self.batch_size = batch_size
+    self.cache = {}
+    self.cache_size = 0
+    self._load_cache()
+
+  def _load_cache(self):
+    if self.data_file_idx == len(self.data_files):
+      self.data_file_idx = 0
+    if self.data_file_idx == 0:
+      np.random.shuffle(self.data_files)
+    self.cache_idx = 0
+
+    load_success = False
+    while not load_success:
+      try:
+        self.cache = load_hdf5(
+          os.path.join(self.data_dir, self.data_files[self.data_file_idx])
+        )
+        load_success = True
+      except Exception as e:
+        print(e)
+        print(self.data_dir)
+        print(self.data_files[self.data_file_idx])
+        time.sleep(10)
+    self.data_file_idx += 1
+
+    for k, v in self.cache.items():
+      if self.cache_size == 0:
+        self.cache_size = v.shape[0]
+      else:
+        if self.cache_size != v.shape[0]:
+          print('Error: all the data should have the same size along axis 0.')
+          print('In %s - %s' % (self.data_files[self.data_file_idx - 1], k))
+
+    shuffled_indices = np.random.permutation(self.cache_size)
+
+    for k, v in self.cache.items():
+      self.cache[k] = v[shuffled_indices]
+
+  def next_batch(self):
+    start = self.cache_idx
+    end = self.cache_idx + self.batch_size
+    if end > self.cache_size:
+      self._load_cache()
+      return self.next_batch()
+    self.cache_idx = end
+    data = {k: v[start:end] for k, v in self.cache.items()}
+    return data
