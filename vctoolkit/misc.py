@@ -592,6 +592,8 @@ class DataLoader:
         if self.cache_size != v.shape[0]:
           print('Error: all the data should have the same size along axis 0.')
           print('In %s - %s' % (self.data_files[self.data_file_idx - 1], k))
+          print('%d (expected) vs %d (practical)' % (self.cache_size, v.shape[0]))
+          exit(0)
 
     shuffled_indices = np.random.permutation(self.cache_size)
 
