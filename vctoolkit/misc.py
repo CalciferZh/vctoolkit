@@ -584,6 +584,7 @@ class DataLoader:
         time.sleep(10)
     self.data_file_idx += 1
 
+    self.cache_size = 0
     for k, v in self.cache.items():
       if self.cache_size == 0:
         self.cache_size = v.shape[0]
