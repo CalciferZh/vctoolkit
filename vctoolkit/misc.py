@@ -499,6 +499,46 @@ def progress_bar(repeat):
   return tqdm.tqdm(list(range(repeat)), ascii=True)
 
 
+def get_bbox(uv, scale, limit,
+             rand_scale=False, rand_min=1.0, rand_max=2.0, square=False):
+  """
+  Get the bounding box of give uv coordinates.
+
+  Parameters
+  ----------
+  uv : [N, 2]
+    UV coordinates.
+  scale : float
+    Scale of the bounding box.
+  limit : [2]
+    The bottom-right of the bbox will be clipped to [0, limit]
+  rand_scale : bool, optional
+    Random scaling, by default False
+  rand_min : float, optional
+    Min random scale factor, by default 1.0
+  rand_max : float, optional
+    Max random scale factor, by default 2.0
+  square : bool, optional
+    Wether to make the bbox square, by default False
+  """
+  tl = np.min(uv, axis=0)
+  br = np.max(uv, axis=0)
+  center = (br + tl) / 2
+
+  size = br - tl
+  if square:
+    size = np.max(size)
+  if rand_scale:
+    size *= np.random.uniform(rand_min, rand_max)
+  else:
+    size *= scale
+
+  tl = np.round(np.clip(center - size / 2, 0, limit)).astype(np.int32)
+  br = np.round(np.clip(center + size / 2, 0, limit)).astype(np.int32)
+
+  return tl, br
+
+
 class ParallelReader:
   def __init__(self, readers):
     """
