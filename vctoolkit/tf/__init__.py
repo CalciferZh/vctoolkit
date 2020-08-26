@@ -19,7 +19,7 @@ def tensor_shape(t):
   return t.get_shape().as_list()
 
 
-def conv(inputs, oc, ks, st, rate=1):
+def conv(inputs, oc, ks, st, rt=1, pd='SAME'):
   """
   Convolution.
 
@@ -33,8 +33,10 @@ def conv(inputs, oc, ks, st, rate=1):
     Kernel size.
   st : int
     Stride.
-  rate : int, optional
-    Dilation rate, by default 1
+  rt : int, optional
+    Dilation rate, by default 1.
+  pd : str
+    Padding, by default 'SAME'.
 
   Returns
   -------
@@ -42,15 +44,15 @@ def conv(inputs, oc, ks, st, rate=1):
     Output tensor.
   """
   layer = tf.layers.conv2d(
-    inputs, oc, ks, strides=st, padding='SAME', use_bias=False,
-    dilation_rate=rate,
+    inputs, oc, ks, strides=st, padding=pd, use_bias=False,
+    dilation_rate=rt,
     kernel_regularizer=tf.contrib.layers.l2_regularizer(1.0),
     kernel_initializer=tf.contrib.layers.xavier_initializer()
   )
   return layer
 
 
-def conv_bn(inputs, oc, ks, st, scope, training, rate=1):
+def conv_bn(inputs, oc, ks, st, scope, training, rt=1, pd='SAME'):
   """
   Convolution - batch normalization.
 
@@ -68,8 +70,10 @@ def conv_bn(inputs, oc, ks, st, scope, training, rate=1):
     Variable scope.
   training : bool
     Is training or not.
-  rate : int, optional
-    Dilation rate, by default 1
+  rt : int, optional
+    Dilation rate, by default 1.
+  pd : str
+    Padding, by default 'SAME'.
 
   Returns
   -------
@@ -77,12 +81,12 @@ def conv_bn(inputs, oc, ks, st, scope, training, rate=1):
     Output tensor.
   """
   with tf.variable_scope(scope):
-    layer = conv(inputs, oc, ks, st, rate)
+    layer = conv(inputs, oc, ks, st, rt, pd)
     layer = tf.layers.batch_normalization(layer, training=training)
   return layer
 
 
-def conv_bn_relu(inputs, oc, ks, st, scope, training, rate=1):
+def conv_bn_relu(inputs, oc, ks, st, scope, training, rt=1, pd='SAME'):
   """
   Convolution - batch normalization - relu.
 
@@ -100,15 +104,18 @@ def conv_bn_relu(inputs, oc, ks, st, scope, training, rate=1):
     Variable scope.
   training : bool
     Training or not.
-  rate : int, optional
-    Dilation rate, by default 1
+  rt : int, optional
+    Dilation rate, by default 1.
+  pd : str
+    Padding, by default 'SAME'.
+
 
   Returns
   -------
   tensor
     Output tensor.
   """
-  layer = conv_bn(inputs, oc, ks, st, scope, training, rate=rate)
+  layer = conv_bn(inputs, oc, ks, st, scope, training, rt, pd)
   layer = tf.nn.relu(layer)
   return layer
 
