@@ -67,6 +67,18 @@ def imshow_onerow(imgs, save_path=None):
   imshow_grid(imgs, 1, len(imgs), save_path)
 
 
+def render_dots_from_uv(uv, canvas, radius=None):
+  if canvas.dtype != np.uint8:
+    print('canvas must be uint8 type')
+    exit(0)
+  if radius is None:
+    radius = int(max(round(canvas.shape[0] / 128), 1))
+  uv = np.round(uv).astype(np.int32)
+  for i in range(uv.shape[0]):
+    cv2.circle(canvas, (uv[i][1], uv[i][0]), radius, (255, 0, 0), thickness=-1)
+  return canvas
+
+
 def render_bones_from_uv(uv, canvas, parents, color=None, thickness=None):
   """
   Render bones from joint uv coordinates.
