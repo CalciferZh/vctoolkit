@@ -67,15 +67,21 @@ def imshow_onerow(imgs, save_path=None):
   imshow_grid(imgs, 1, len(imgs), save_path)
 
 
-def render_dots_from_uv(uv, canvas, radius=None):
+def render_dots_from_uv(uv, canvas, id_label=False, radius=None):
   if canvas.dtype != np.uint8:
     print('canvas must be uint8 type')
     exit(0)
   if radius is None:
     radius = int(max(round(canvas.shape[0] / 128), 1))
+  font_scale = canvas.shape[0] / 480
   uv = np.round(uv).astype(np.int32)
   for i in range(uv.shape[0]):
     cv2.circle(canvas, (uv[i][1], uv[i][0]), radius, (255, 0, 0), thickness=-1)
+    if id_label:
+      cv2.putText(
+        canvas, '%d' % i, (uv[i][1], uv[i][0]), cv2.FONT_HERSHEY_PLAIN,
+        font_scale, (0, 0, 255)
+      )
   return canvas
 
 
