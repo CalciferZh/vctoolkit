@@ -409,3 +409,32 @@ def ply_save_color_pcloud(path, pcloud, color):
 
 
 save_ply_color_pcloud = ply_save_color_pcloud
+
+
+def load_obj(file_path):
+  """
+  Read the most naive .obj file. Only supports `v` and `f`.
+
+  Parameters
+  ----------
+  file_path : str
+    Path to the file.
+
+  Returns
+  -------
+  [N, 3]
+    Vertices.
+  [N, 3]
+    Faces (Vertex index starts from 0).
+  """
+  lines = load_txt(file_path)
+  verts = []
+  faces = []
+  for l in lines:
+    if l[0] == 'v':
+      verts.append(np.array([float(v) for v in l.split()[1:]]))
+    elif l[0] == 'f':
+      faces.append(np.array([int(v) - 1 for v in l.split()[1:]]))
+  verts = np.array(verts)
+  faces = np.array(faces)
+  return verts, faces
