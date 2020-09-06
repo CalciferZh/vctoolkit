@@ -499,6 +499,10 @@ def progress_bar(repeat):
   return tqdm.tqdm(list(range(repeat)), ascii=True)
 
 
+def tqdm(producer):
+  return tqdm.tqdm(producer, ascii=True)
+
+
 def get_bbox(uv, scale, limit,
              rand_scale=False, rand_min=1.0, rand_max=2.0, square=False):
   """
