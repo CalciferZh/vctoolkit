@@ -495,8 +495,8 @@ def axangle_to_rotmat(vec):
   return transforms3d.axangles.axangle2mat(axis, angle)
 
 
-def progress_bar(producer):
-  return tqdm.tqdm(list(producer), ascii=True)
+def progress_bar(producer, text=None):
+  return tqdm.tqdm(list(producer), ascii=True, desc=text, dynamic_ncols=True)
 
 
 def get_bbox(uv, scale, limit,
