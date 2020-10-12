@@ -79,6 +79,31 @@ def imresize(img, size):
   return cv2.resize(img, size, cv2.INTER_LINEAR)
 
 
+def imresize_diag(img, w=None, h=None):
+  """
+  Resize am image but keep the aspect ratio, according to target width or height.
+
+  Parameters
+  ----------
+  img : [H, W, C]
+    Image.
+  w : int, optional
+    Target width, by default None
+  h : int, optional
+    Target height, by default None
+
+  Returns
+  -------
+  [H, W, C]
+    Image.
+  """
+  if w is None:
+    w = int(round(h / img.shape[0] * img.shape[1]))
+  else:
+    h = int(round(w / img.shape[1] * img.shape[0]))
+  return vc.imresize(img, (w, h))
+
+
 def render_gaussian_hmap(centers, shape, sigma=None):
   """
   Render gaussian heat maps from given centers.
