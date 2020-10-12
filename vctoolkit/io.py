@@ -309,6 +309,9 @@ class VideoWriter:
     fps : int
       Video frame rate.
     """
+    self.fps = fps
+    self.width = width
+    self.height = height
     self.video = cv2.VideoWriter(
       path, cv2.VideoWriter_fourcc(*'H264'), fps, (width, height)
     )
