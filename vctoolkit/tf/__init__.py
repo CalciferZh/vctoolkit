@@ -1,4 +1,5 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 import numpy as np
 
 
@@ -44,10 +45,7 @@ def conv(inputs, oc, ks, st, rt=1, pd='SAME'):
     Output tensor.
   """
   layer = tf.layers.conv2d(
-    inputs, oc, ks, strides=st, padding=pd, use_bias=False,
-    dilation_rate=rt,
-    kernel_regularizer=tf.contrib.layers.l2_regularizer(1.0),
-    kernel_initializer=tf.contrib.layers.xavier_initializer()
+    inputs, oc, ks, strides=st, padding=pd, use_bias=False, dilation_rate=rt
   )
   return layer
 
@@ -141,9 +139,7 @@ def deconv(inputs, oc, ks, st):
     Output tensor.
   """
   layer = tf.layers.conv2d_transpose(
-    inputs, oc, ks, st, padding='SAME', use_bias=False,
-    kernel_initializer=tf.contrib.layers.xavier_initializer(),
-    kernel_regularizer=tf.contrib.layers.l2_regularizer(1.0),
+    inputs, oc, ks, st, padding='SAME', use_bias=False
   )
   return layer
 
@@ -210,7 +206,6 @@ def deconv_bn_relu(inputs, oc, ks, st, scope, training):
 def dense(layer, n_units):
   layer = tf.layers.dense(
     layer, n_units, activation=None,
-    kernel_regularizer=tf.contrib.layers.l2_regularizer(1.0),
     kernel_initializer=tf.initializers.truncated_normal(stddev=0.01)
   )
   return layer
