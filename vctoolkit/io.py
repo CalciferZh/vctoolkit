@@ -296,7 +296,7 @@ class VideoWriter:
   Call `close` to release resource.
 
   """
-  def __init__(self, path, width, height, fps):
+  def __init__(self, path, width, height, fps, codec='H264'):
     """
     Parameters
     ----------
@@ -308,12 +308,14 @@ class VideoWriter:
       Frame height.
     fps : int
       Video frame rate.
+    codec : str, optional
+      Video codec, by default H264.
     """
     self.fps = fps
     self.width = width
     self.height = height
     self.video = cv2.VideoWriter(
-      path, cv2.VideoWriter_fourcc(*'H264'), fps, (width, height)
+      path, cv2.VideoWriter_fourcc(*codec), fps, (width, height)
     )
     self.frame_idx = 0
 
