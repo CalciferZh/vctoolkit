@@ -674,3 +674,25 @@ class DataLoader:
     self.cache_idx = end
     data = {k: v[start:end] for k, v in self.cache.items()}
     return data
+
+
+def press_to_continue(exit_0=True):
+  """
+  Wait for user input to continue. Enter 'n' to exit.
+
+  Parameters
+  ----------
+  exit_0 : bool, optional
+    If True, will directly exit(0), instead of return False, by default True
+
+  Returns
+  -------
+  bool
+    Continue or not.
+  """
+  if input('Continue? (enter n to exit)') == 'n':
+    if exit_0:
+      exit(0)
+    else:
+      return False
+  return True
