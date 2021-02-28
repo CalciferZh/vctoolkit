@@ -696,3 +696,11 @@ def press_to_continue(exit_0=True):
     else:
       return False
   return True
+
+
+def examine_dict(data):
+  for k, v in data.items():
+    if type(v) == np.ndarray:
+      print(k, type(v), v.shape)
+    else:
+      print(k, type(v))
