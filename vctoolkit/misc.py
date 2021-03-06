@@ -603,7 +603,9 @@ class CascadeReader:
   def next_batch(self):
     if self.reader_idx == len(self.readers):
       self.reader_idx = 0
-    return self.readers[self.reader_idx].next_batch()
+    data = self.readers[self.reader_idx].next_batch()
+    self.reader_idx += 1
+    return data
 
 
 class DataLoader:
