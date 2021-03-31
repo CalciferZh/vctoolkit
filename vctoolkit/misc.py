@@ -344,7 +344,7 @@ def xyz_to_delta(xyz, parents, norm_delta):
   np.ndarray, [n, 1]
     Bone lengths.
   """
-  delta = np.zeros([len(parents), 3])
+  delta = np.zeros([len(parents), 3], np.float32)
   for c, p in enumerate(parents):
     if p is None:
       continue
