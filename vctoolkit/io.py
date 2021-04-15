@@ -98,6 +98,11 @@ def load_hdf5(path):
   return data
 
 
+def save_txt(path, s):
+  with open(path, 'w') as f:
+    f.write(s)
+
+
 def load_txt(path):
   """
   Read all lines from a text file.

@@ -189,7 +189,7 @@ class Timer:
 
   """
   def __init__(self):
-    self.last_tic = 0
+    self.last_tic = time.time()
     self.memory = {}
 
   def tic(self, key=None):
