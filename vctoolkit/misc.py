@@ -706,3 +706,7 @@ def examine_dict(data):
       print(k, type(v), v.shape)
     else:
       print(k, type(v))
+
+
+def set_extension(file_name, ext):
+  return os.path.splitext(file_name)[0] + '.' + ext

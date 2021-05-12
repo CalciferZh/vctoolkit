@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
   name = 'vctoolkit',
-  version = '0.1.5.35',
+  version = '0.1.5.36',
   author = 'Yuxiao Zhou',
   author_email = 'yuxiao.zhou@outlook.com',
   description = 'A simple wrapper for commonly used tools in visual computing.',
