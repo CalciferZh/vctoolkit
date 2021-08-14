@@ -1,4 +1,7 @@
 import open3d as o3d
+import numpy as np
+from ..io import VideoWriter
+from tqdm import tqdm
 
 
 def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
