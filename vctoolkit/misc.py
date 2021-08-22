@@ -101,7 +101,7 @@ def imresize_diag(img, w=None, h=None):
     w = int(round(h / img.shape[0] * img.shape[1]))
   else:
     h = int(round(w / img.shape[1] * img.shape[0]))
-  return vc.imresize(img, (w, h))
+  return imresize(img, (w, h))
 
 
 def render_gaussian_hmap(centers, shape, sigma=None):
