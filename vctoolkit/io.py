@@ -22,7 +22,7 @@ def load(path):
   elif ext == 'pkl':
     return load_pkl(path)
   elif ext in ['png', 'jpg', 'jpeg']:
-    return load_img(path)
+    return np.array(load_img(path))
   elif ext == 'obj':
     return load_obj(path)
   else:

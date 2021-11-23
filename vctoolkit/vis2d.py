@@ -20,20 +20,30 @@ def imshow_cv(img, caption='OpenCV Image Show'):
   cv2.waitKey()
 
 
-def imshow(img):
+def imshow(img, save_path=None):
   """
   Show an image with matplotlib.
 
   Parameters
   ----------
-  img : np.ndarray
+  img : np.ndarray, or list
     Image to show.
+  save_path : str
+    Path to save the figure.
   """
-  plt.imshow(img)
-  plt.show()
+  if type(img) == np.ndarray:
+    plt.imshow(img)
+    if save_path is not None:
+      plt.savefig(save_path)
+    plt.show()
+    plt.close()
+  elif type(img) == list:
+    imshow_grid(img)
+  else:
+    raise NotImplementedError('Unsupported type for visualization: ' + str(type(img)))
 
 
-def imshow_grid(imgs, nrows, ncols, save_path=None):
+def imshow_grid(imgs, save_path=None):
   """
   Display multiple images as a grid.
 
@@ -45,26 +55,19 @@ def imshow_grid(imgs, nrows, ncols, save_path=None):
     Number of rows.
   ncols : int
     Number of columns.
+  save_path : str
+    Path to save the figure.
   """
   fig = plt.figure()
-  for i, img in enumerate(imgs):
-    fig.add_subplot(nrows, ncols, i+1)
+  n_rows = len(imgs)
+  n_cols = len(imgs[0])
+  for i, img in enumerate(sum(imgs, [])):
+    fig.add_subplot(n_rows, n_cols, i+1)
     plt.imshow(img)
-  plt.show()
   if save_path is not None:
     plt.savefig(save_path)
-
-
-def imshow_onerow(imgs, save_path=None):
-  """
-  Display images in one row.
-
-  Parameters
-  ----------
-  imgs : list
-    List of images to be displayed.
-  """
-  imshow_grid(imgs, 1, len(imgs), save_path)
+  plt.show()
+  plt.close(fig)
 
 
 def render_dots_from_uv(uv, canvas, id_label=False, radius=None):
