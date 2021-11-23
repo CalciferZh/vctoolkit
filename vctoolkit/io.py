@@ -6,6 +6,45 @@ import h5py
 import imageio
 import numpy as np
 import scipy.io
+import os
+
+
+def load(path):
+  ext = os.path.splitext(path)[1][1:]
+  if ext == 'json':
+    return load_json(path)
+  elif ext == 'mat':
+    return load_mat(path)
+  elif ext == 'h5':
+    return load_hdf5(path)
+  elif ext == 'txt':
+    return load_txt(path)
+  elif ext == 'pkl':
+    return load_pkl(path)
+  elif ext in ['png', 'jpg', 'jpeg']:
+    return load_img(path)
+  elif ext == 'obj':
+    return load_obj(path)
+  else:
+    raise NotImplementedError('Unsupported file extension: ' + path)
+
+
+def save(path, data):
+  ext = os.path.splitext(path)[1][1:]
+  if ext == 'json':
+    return save_json(path, data)
+  elif ext == 'h5':
+    return save_hdf5(path, data)
+  elif ext == 'txt':
+    return save_txt(path, data)
+  elif ext == 'pkl':
+    return save_pkl(path, data)
+  elif ext in ['png', 'jpg', 'jpeg']:
+    return save_img(path, data)
+  elif ext == 'obj':
+    return save_obj(path, data)
+  else:
+    raise NotImplementedError('Unsupported file extension: ' + path)
 
 
 def load_json(path):
