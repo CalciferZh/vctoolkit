@@ -25,6 +25,8 @@ def load(path):
     return np.array(load_img(path))
   elif ext == 'obj':
     return load_obj(path)
+  elif ext == '.npy' or ext == '.npz':
+    return np.load(path)
   else:
     raise NotImplementedError('Unsupported file extension: ' + path)
 
@@ -43,6 +45,10 @@ def save(path, data):
     return save_img(path, data)
   elif ext == 'obj':
     return save_obj(path, data)
+  elif ext == '.npy':
+    return np.save(path, data)
+  elif ext == '.npz':
+    return np.savez(path, data)
   else:
     raise NotImplementedError('Unsupported file extension: ' + path)
 
