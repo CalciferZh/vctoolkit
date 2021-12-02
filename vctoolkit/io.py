@@ -44,7 +44,7 @@ def save(path, data):
   elif ext in ['png', 'jpg', 'jpeg']:
     return save_img(path, data)
   elif ext == 'obj':
-    return save_obj(path, data)
+    return save_obj(path, *data)
   elif ext == '.npy':
     return np.save(path, data)
   elif ext == '.npz':
@@ -84,7 +84,7 @@ def save_json(path, data):
     Data to save.
   """
   with open(path, 'w') as f:
-    f.write(json.dumps(data))
+    f.write(json.dumps(data, indent=2))
 
 
 def load_mat(path):
