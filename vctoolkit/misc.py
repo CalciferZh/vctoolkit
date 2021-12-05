@@ -692,7 +692,7 @@ def press_to_continue(exit_0=True):
   bool
     Continue or not.
   """
-  if input('Continue? (enter n to exit)') == 'n':
+  if input('Continue? (enter n to exit) ') == 'n':
     if exit_0:
       exit(0)
     else:
