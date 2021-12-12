@@ -192,7 +192,7 @@ class Timer:
     self.last_tic = time.time()
     self.memory = {}
 
-  def tic(self, key=None):
+  def tic(self, key=None, reset=True):
     """
     Save current timestamp and return the interval from previous tic.
 
@@ -200,6 +200,8 @@ class Timer:
     ----------
     key : str, optional
       Key to save this interval, by default None
+    reset : bool, optional
+      If to reset the last tic time, by default True
 
     Returns
     -------
@@ -212,7 +214,8 @@ class Timer:
       interval = curr_time - self.last_tic
       if key is not None:
         self.memory[key] = interval
-    self.last_tic = curr_time
+    if reset:
+      self.last_tic = curr_time
     return interval
 
 
@@ -700,12 +703,21 @@ def press_to_continue(exit_0=True):
   return True
 
 
-def examine_dict(data):
+def examine_dict(data, indent=0):
   for k, v in data.items():
+    print(' ' * indent, k, type(v), end=' ')
     if type(v) == np.ndarray:
-      print(k, type(v), v.shape)
+      print(' ' * indent, v.shape)
+    elif type(v) == dict:
+      print()
+      examine_dict(v, indent + 1)
+    elif type(v) == list or type(v) == tuple:
+      print(len(list), type(v[0]))
     else:
-      print(k, type(v))
+      print()
+
+
+inspect_dict = examine_dict
 
 
 def set_extension(file_name, ext):
