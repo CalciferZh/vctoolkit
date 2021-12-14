@@ -78,7 +78,6 @@ def convert(rot, src, tar):
       y = (rot[:, 0, 2] - rot[:, 2, 0]) / norm
       z = (rot[:, 1, 0] - rot[:, 0, 1]) / norm
       axangle = np.stack([x, y, z], -1) * angle
-      axangle *= np.sign(axangle)
       axangle = np.reshape(axangle, data_shape + (3,))
       return axangle
 
@@ -172,7 +171,7 @@ def rotmat_abs_to_rel(abs_rotmat, parents, batch=False):
 
 def keypoints_to_bones(keypoints, parents, batch=False):
   if not batch:
-    keypoints = np.expand_dims(keypoints)
+    keypoints = np.expand_dims(keypoints, 0)
   bones = []
   for c, p in enumerate(parents):
     if p is None:

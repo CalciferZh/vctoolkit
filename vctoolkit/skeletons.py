@@ -260,7 +260,7 @@ class MANOHand(BaseSkeleton):
   ]
 
   # finger tips are not keypoints in MANO, we label them on the mesh manually
-  extended_verts = {16: 333, 17: 444, 18: 672, 19: 555, 20: 744}
+  extended_keypoints = {16: 333, 17: 444, 18: 672, 19: 555, 20: 744}
 
   parents = [
     None,
