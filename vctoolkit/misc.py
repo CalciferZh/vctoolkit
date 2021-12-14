@@ -524,6 +524,8 @@ def axangle_to_rotmat(vec):
 
 
 def progress_bar(producer, text=None):
+  if type(producer) == int:
+    producer = range(producer)
   return tqdm.tqdm(list(producer), ascii=True, desc=text, dynamic_ncols=True)
 
 
@@ -712,7 +714,7 @@ def examine_dict(data, indent=0):
       print()
       examine_dict(v, indent + 1)
     elif type(v) == list or type(v) == tuple:
-      print(len(list), type(v[0]))
+      print(len(v), type(v[0]))
     else:
       print()
 
