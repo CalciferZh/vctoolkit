@@ -5,6 +5,7 @@ import uuid as uuid_import
 import transforms3d
 import tqdm
 import os
+import math
 
 from .io import load_hdf5
 
@@ -756,3 +757,18 @@ def slerp(a, b, t, batch=False):
   if not batch:
     p = p[0]
   return p
+
+
+def put_text(img, text, origin=None, color=(0, 255, 0)):
+  """
+  origin : tuple, optional
+    (x, y), by default None
+  """
+  font = cv2.FONT_HERSHEY_DUPLEX
+  size = int(math.ceil(max(img.shape) / 128))
+  box = cv2.getTextSize(text, fontFace=font, fontScale=size, thickness=size)
+  if origin is None:
+    origin = (10, 10)
+  origin = (origin[0], origin[1] + box[1])
+  cv2.putText(img, text, origin, font, size, color=color, thickness=size)
+  return img

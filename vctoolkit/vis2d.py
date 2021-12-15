@@ -265,3 +265,31 @@ def select_frames_from_video(video_path, save_prefix=None, fps=60, scale=1):
     pygame.display.update()
 
     clock.tick(fps)
+
+
+def concat_videos(src_paths, tar_path, height=None, width=None):
+  """
+  You should only set height or width.
+  """
+  if height is None and width is None:
+    raise RuntimeError('You must set either the height or the width.')
+  readers = [VideoReader(p) for p in src_paths]
+  writer = None
+  for _ in progress_bar(readers[0].n_frames + 10):
+    canvas = []
+    for r in readers:
+      frame = r.next_frame()
+      if frame is None:
+        break
+      canvas.append(imresize_diag(frame, width, height))
+    if height is None:
+      canvas = np.concatenate(canvas, 0)
+    else:
+      canvas = np.concatenate(canvas, 1)
+    if writer is not None:
+      writer = \
+        VideoWriter(tar_path, canvas.shape[1], canvas.shape[0], readers[0].fps)
+    writer.write_frame(canvas)
+  for r in readers:
+    r.close()
+  writer.close()
