@@ -161,7 +161,7 @@ def rotmat_abs_to_rel(abs_rotmat, parents, batch=False):
     else:
       rel_rotmat[c] = np.einsum(
         'nhw, nwd -> nhd',
-        abs_rotmat[:, c], np.transpose(abs_rotmat[:, p], (0, 2, 1))
+        np.transpose(abs_rotmat[:, p], (0, 2, 1)), abs_rotmat[:, c]
       )
   rel_rotmat = np.stack(rel_rotmat, 1)
   if not batch:

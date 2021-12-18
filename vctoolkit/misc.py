@@ -709,13 +709,13 @@ def press_to_continue(exit_0=True):
 def examine_dict(data, indent=0):
   for k, v in data.items():
     print(' ' * indent, k, type(v), end=' ')
-    if type(v) == np.ndarray:
+    if hasattr(v, 'shape'):
       print(' ' * indent, v.shape)
+    elif hasattr(v, '__len__'):
+      print(len(v), type(v[0]))
     elif type(v) == dict:
       print()
       examine_dict(v, indent + 1)
-    elif type(v) == list or type(v) == tuple:
-      print(len(v), type(v[0]))
     else:
       print()
 

@@ -4,7 +4,7 @@ from tqdm import tqdm
 from transforms3d.axangles import axangle2mat
 
 
-def joints_to_mesh(joints, parents, color=None, thickness=0.2):
+def joints_to_mesh(joints, parents, color=None, thickness=0.2, save_path=None):
   """
   Produce a mesh representing the skeleton with given joint coordinates.
   Bones are represented by prisms.
@@ -83,5 +83,8 @@ def joints_to_mesh(joints, parents, color=None, thickness=0.2):
 
   if color is not None:
     return verts, faces, face_color
+
+  if save_path is not None:
+    save(save_path, (verts, faces))
 
   return verts, faces
