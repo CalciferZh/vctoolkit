@@ -706,21 +706,21 @@ def press_to_continue(exit_0=True):
   return True
 
 
-def examine_dict(data, indent=0):
+def inspect_dict(data, indent=0):
   for k, v in data.items():
     print(' ' * indent, k, type(v), end=' ')
     if hasattr(v, 'shape'):
       print(' ' * indent, v.shape)
-    elif hasattr(v, '__len__'):
-      print(len(v), type(v[0]))
     elif type(v) == dict:
       print()
       examine_dict(v, indent + 1)
+    elif hasattr(v, '__len__'):
+      print(len(v))
     else:
       print()
 
 
-inspect_dict = examine_dict
+examine_dict = inspect_dict
 
 
 def set_extension(file_name, ext):
