@@ -299,6 +299,90 @@ class MPIIHand(BaseSkeleton):
   ]
 
 
+class SMPLH65(BaseSkeleton):
+  n_keypoints = 65
+
+  center = root = 0
+
+  labels = [
+    'pelvis', # 0
+    'left_hip', 'right_hip', # 2
+    'lowerback', # 3
+    'left_knee', 'right_knee', # 5
+    'upperback', # 6
+    'left_ankle', 'right_ankle', # 8
+    'thorax', # 9
+    'left_toes', 'right_toes', # 11
+    'lowerneck', # 12
+    'left_clavicle', 'right_clavicle', # 14
+    'upperneck', # 15
+    'left_shoulder', 'right_shoulder', # 17
+    'left_elbow', 'right_elbow', # 19
+    'left_wrist', 'right_wrist', # 21
+    # left hand
+    'LI0', 'LI1', 'LI2', # 24
+    'LM0', 'LM1', 'LM2', # 27
+    'LL0', 'LL1', 'LL2', # 30
+    'LR0', 'LR1', 'LR2', # 33
+    'LT0', 'LT1', 'LT2', # 36
+    # right hand
+    'RI0', 'RI1', 'RI2', # 39
+    'RM0', 'RM1', 'RM2', # 42
+    'RL0', 'RL1', 'RL2', # 45
+    'RR0', 'RR1', 'RR2', # 48
+    'RT0', 'RT1', 'RT2', # 51
+    # extended keypoints
+    # hand tips
+    'LI3', 'LM3', 'LL3', 'LR3', 'LT3', # 56
+    'RI3', 'RM3', 'RL3', 'RR3', 'RT3', # 61
+    # foot middle toe root
+    'LMT', 'RMT' # 63
+    # head top
+    'head_top' # 64
+  ]
+
+  parents = [
+    None,
+    0, 0,
+    0,
+    1, 2,
+    3,
+    4, 5,
+    6,
+    7, 8,
+    9,
+    9, 9,
+    12,
+    13, 14,
+    16, 17,
+    18, 19,
+    # left hand
+    20, 22, 23,
+    20, 25, 26,
+    20, 28, 29,
+    20, 31, 32,
+    20, 34, 35,
+    # right hand
+    21, 37, 38,
+    21, 40, 41,
+    21, 43, 44,
+    21, 46, 47,
+    21, 49, 50,
+    # extended keypoints
+    24, 27, 30, 33, 36,
+    39, 42, 45, 48, 51,
+    10, 11,
+    15
+  ]
+
+  # the vertex indices of the extended keypoints
+  extended_keypoints = {
+    52: 2319, 53: 2445, 54: 2673, 55: 2556, 56: 2746,
+    57: 5782, 58: 5905, 59: 6133, 60: 6016, 61: 6206,
+    62: 3255, 63: 6655, 64: 411
+  }
+
+
 def get_left_right_bone_color(skeleton):
   color = []
   for l in skeleton.labels:
