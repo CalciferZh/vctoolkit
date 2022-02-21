@@ -7,7 +7,6 @@ import imageio
 import numpy as np
 import scipy.io
 import os
-from .skeletons import *
 
 
 def load(path):

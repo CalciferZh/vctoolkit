@@ -286,7 +286,7 @@ def concat_videos(src_paths, tar_path, height=None, width=None):
       canvas = np.concatenate(canvas, 0)
     else:
       canvas = np.concatenate(canvas, 1)
-    if writer is not None:
+    if writer is None:
       writer = \
         VideoWriter(tar_path, canvas.shape[1], canvas.shape[0], readers[0].fps)
     writer.write_frame(canvas)

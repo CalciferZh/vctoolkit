@@ -383,6 +383,55 @@ class SMPLH65(BaseSkeleton):
   }
 
 
+class SMPL26(BaseSkeleton):
+  n_keypoints = 26
+
+  center = root = 0
+
+  labels = [
+    'pelvis', # 0
+    'left_hip', 'right_hip', # 2
+    'lowerback', # 3
+    'left_knee', 'right_knee', # 5
+    'upperback', # 6
+    'left_ankle', 'right_ankle', # 8
+    'thorax', # 9
+    'left_toes', 'right_toes', # 11
+    'lowerneck', # 12
+    'left_clavicle', 'right_clavicle', # 14
+    'upperneck', # 15
+    'left_shoulder', 'right_shoulder', # 17
+    'left_elbow', 'right_elbow', # 19
+    'left_wrist', 'right_wrist', # 21
+    'left_hand', 'right_hand', # 23
+    'left_hand_tip', 'right_hand_tip' # 25
+  ]
+
+  parents = [
+    None,
+    0, 0,
+    0,
+    1, 2,
+    3,
+    4, 5,
+    6,
+    7, 8,
+    9,
+    9, 9,
+    12,
+    13, 14,
+    16, 17,
+    18, 19,
+    20, 21,
+    22, 23
+  ]
+
+  # the vertex indices of the extended keypoints
+  extended_keypoints = {
+    24: 2445, 25: 5905
+  }
+
+
 def get_left_right_bone_color(skeleton):
   color = []
   for l in skeleton.labels:
