@@ -116,7 +116,7 @@ class HM36MBody23(BaseSkeleton):
     'left_shoulder', 'left_elbow', 'left_wrist', 'left_hand', # 8
     'right_shoulder', 'right_elbow', 'right_wrist', 'right_hand', # 12
     'left_hip', 'left_knee', 'left_ankle', 'left_foot', 'left_toe', # 17
-    'right_hip', 'right_knee', 'right_ankle', 'right_foot', 'right_knee' # 22
+    'right_hip', 'right_knee', 'right_ankle', 'right_foot', 'right_toe' # 22
   ]
 
   n_keypoints = 23
