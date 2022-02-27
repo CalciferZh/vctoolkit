@@ -33,8 +33,8 @@ def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
     if type(verts) == list:
       verts = np.stack(verts, 0)
 
-    scale = np.max(np.max(verts, axis=(0, 1)) - np.min(verts, axis=(0, 1)))
     mean = np.mean(verts, axis=(0, 1), keepdims=True)
+    scale = np.max(np.std(verts, axis=(0, 1), keepdims=True)) * 3
     verts = (verts - mean) / scale
 
   cam_offset = 1.2

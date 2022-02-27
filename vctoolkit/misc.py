@@ -708,14 +708,14 @@ def press_to_continue(exit_0=True):
 
 def inspect_dict(data, indent=0):
   for k, v in data.items():
-    print(' ' * indent, k, type(v), end=' ')
+    print('  ' * indent, k, type(v), end=', ')
     if hasattr(v, 'shape'):
-      print(' ' * indent, v.shape)
+      print(f'shape = {v.shape} |')
     elif type(v) == dict:
       print()
       examine_dict(v, indent + 1)
     elif hasattr(v, '__len__'):
-      print(len(v))
+      print(f'length = {len(v)}')
     else:
       print()
 
@@ -772,3 +772,8 @@ def put_text(img, text, origin=None, color=(0, 255, 0)):
   origin = (origin[0], origin[1] + box[1])
   cv2.putText(img, text, origin, font, size, color=color, thickness=size)
   return img
+
+
+def count_model_parameters(model):
+  return sum(p.numel() for p in model.parameters() if p.requires_grad)
+

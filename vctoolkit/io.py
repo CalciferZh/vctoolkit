@@ -1,12 +1,13 @@
-import pickle
 import json
+import os
+import pickle
 
 import cv2
 import h5py
 import imageio
 import numpy as np
 import scipy.io
-import os
+import yaml
 
 
 def load(path):
@@ -25,8 +26,10 @@ def load(path):
     return np.array(load_img(path))
   elif ext == 'obj':
     return load_obj(path)
-  elif ext == '.npy' or ext == '.npz':
+  elif ext == 'npy' or ext == 'npz':
     return np.load(path)
+  elif ext == 'yaml':
+    return load_yaml(path)
   else:
     raise NotImplementedError('Unsupported file extension: ' + path)
 
@@ -45,12 +48,25 @@ def save(path, data):
     return save_img(path, data)
   elif ext == 'obj':
     return save_obj(path, *data)
-  elif ext == '.npy':
+  elif ext == 'npy':
     return np.save(path, data)
-  elif ext == '.npz':
+  elif ext == 'npz':
     return np.savez(path, data)
+  elif ext == 'yaml':
+    return save_yaml(path, data)
   else:
     raise NotImplementedError('Unsupported file extension: ' + path)
+
+
+def load_yaml(path):
+  with open(path) as f:
+    data = yaml.load(f)
+  return data
+
+
+def save_yaml(path, data):
+  with open(path, 'w') as f:
+    documents = yaml.dump(data, f)
 
 
 def load_json(path):
