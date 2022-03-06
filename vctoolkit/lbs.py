@@ -58,7 +58,7 @@ class LBSMesh():
     return np.stack(outputs)
 
   def set_params(self, pose=None, shape=None, format='rotmat', relative=False,
-                 reference='child'):
+                 reference='child', use_j_regressor=False):
     verts = self.mesh.copy()
     if shape is not None:
       verts = verts + np.einsum('c, vdc -> vd', shape, self.shape_std)
@@ -86,6 +86,7 @@ class LBSMesh():
       'vj, jvd -> vd',
       self.skinning_weights, np.einsum('jhw, vw -> jvh', g_mat, verts)
     )
-    posed_keypoints = np.dot(self.j_regressor, posed_verts)
+    if use_j_regressor:
+      posed_keypoints = np.dot(self.j_regressor, posed_verts)
 
     return posed_keypoints, posed_verts
