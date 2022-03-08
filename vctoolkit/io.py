@@ -60,13 +60,13 @@ def save(path, data):
 
 def load_yaml(path):
   with open(path) as f:
-    data = yaml.load(f)
+    data = yaml.safe_load(f)
   return data
 
 
 def save_yaml(path, data):
   with open(path, 'w') as f:
-    documents = yaml.dump(data, f)
+    yaml.dump(data, f)
 
 
 def load_json(path):
