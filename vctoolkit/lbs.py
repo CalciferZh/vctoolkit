@@ -5,9 +5,13 @@ from . import math_np
 
 
 class LBSMesh():
-  def __init__(self, model_path, skeleton, dtype=np.float32):
+  def __init__(self, model_path, skeleton, dtype=np.float32, fix_shape_bug=False):
     with open(model_path, 'rb') as f:
       data = pickle.load(f, encoding='latin1')
+
+    if fix_shape_bug:
+      data['shapedirs'] = np.array(data['shapedirs'])
+      data['shapedirs'][:, 0, :] *= -1
 
     self.mesh = data['v_template'].astype(dtype)
     self.n_verts = self.mesh.shape[0]
