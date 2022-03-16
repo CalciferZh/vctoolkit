@@ -280,8 +280,11 @@ def concat_videos(src_paths, tar_path, height=None, width=None):
     for r in readers:
       frame = r.next_frame()
       if frame is None:
+        canvas = []
         break
       canvas.append(imresize_diag(frame, width, height))
+    if not canvas:
+      break
     if height is None:
       canvas = np.concatenate(canvas, 0)
     else:
