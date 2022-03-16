@@ -88,7 +88,7 @@ def render_dots_from_uv(uv, canvas, id_label=False, radius=None):
   return canvas
 
 
-def render_bones_from_uv(uv, canvas, parents, color=None, thickness=None):
+def render_bones_from_uv(uv, canvas, skeleton, color=None, thickness=None):
   """
   Render bones from joint uv coordinates.
 
@@ -115,7 +115,11 @@ def render_bones_from_uv(uv, canvas, parents, color=None, thickness=None):
     exit(0)
   if thickness is None:
     thickness = int(max(round(canvas.shape[0] / 128), 1))
-  for child, parent in enumerate(parents):
+
+  if color is None:
+    color = get_left_right_color(skeleton.labels)
+
+  for child, parent in enumerate(skeleton):
     if parent is None:
       continue
     if color is None:

@@ -20,45 +20,17 @@ color_lib = [
 ]
 
 
-def one_hot_decoding(array):
-  """
-  One-hot decoding.
-
-  Parameters
-  ----------
-  array : np.ndarray
-    Array encoded in the last dimension.
-
-  Returns
-  -------
-  np.ndarray
-    Array after decoding.
-  """
-  return np.argmax(array, axis=-1)
-
-
-def one_hot_encoding(array, n_channels):
-  """
-  One-hot decoding.
-
-  Parameters
-  ----------
-  array : np.ndarray
-    Array to be encoded.
-  n_channels : int
-    Number of channels, i.e. number of categories.
-
-  Returns
-  -------
-  np.ndarray
-    Array after encoding.
-  """
-  shape = list(array.shape)
-  array = np.reshape(array, [-1])
-  array = np.eye(n_channels)[array]
-  shape.append(n_channels)
-  array = np.reshape(array, shape)
-  return array
+def get_left_right_color(labels,
+                         left=[255, 0, 0], right=[0, 255, 0], other=[0, 0, 255]):
+  colors = []
+  for l in labels:
+    if 'left' in l:
+      colors.append(left)
+    elif 'right' in l:
+      colors.append(right)
+    else:
+      colors.append(other)
+  return colors
 
 
 def imresize(img, size):
@@ -328,77 +300,6 @@ def hmap_to_uv(hmap):
   return coord
 
 
-def xyz_to_delta(xyz, parents, norm_delta):
-  """
-  Convert joint coordinates to bone orientations (delta).
-
-  Parameters
-  ----------
-  xyz : np.ndarray, shape [k, 3]
-    Joint coordinates.
-  parents : list
-    Parent for each joint.
-  norm_delta : bool
-    Wether normalize bone deltas.
-
-  Returns
-  -------
-  np.ndarray, [n, 3]
-    Bone orientations.
-  np.ndarray, [n, 1]
-    Bone lengths.
-  """
-  delta = np.zeros([len(parents), 3], np.float32)
-  for c, p in enumerate(parents):
-    if p is None:
-      continue
-    else:
-      delta[c] = xyz[c] - xyz[p]
-  length = np.linalg.norm(delta, axis=-1, keepdims=True)
-  if norm_delta:
-    delta /= np.maximum(length, np.finfo(np.float32).eps)
-  return delta, length
-
-
-def delta_to_xyz(delta, parents, length=None):
-  """
-  Convert bone orientations to joint coordinates.
-
-  Parameters
-  ----------
-  delta : np.ndarray, shape [k, 3]
-    Bone orientations.
-  parents : list
-    Parent for each joint.
-  length : list or None
-    The length of each bone (if delta are unit vectors), or None.
-
-  Returns
-  -------
-  np.ndarray, [n, 3]
-    Joint coordinates.
-  """
-  if length is None:
-    length = np.ones(len(parents))
-
-  xyz = [None] * len(parents)
-  done = False
-  while not done:
-    done = True
-    for c, p in enumerate(parents):
-      if xyz[c] is not None:
-        continue
-      if p is None:
-        xyz[c] = delta[c] * length[c]
-      else:
-        if xyz[p] is None:
-          done = False
-        else:
-          xyz[c] = xyz[p] + delta[c] * length[c]
-  xyz = np.stack(xyz, 0)
-  return xyz
-
-
 def camera_proj(k, xyz):
   """
   Camera projection: from camera space to image space.
@@ -505,25 +406,6 @@ def uuid():
   return uuid_import.uuid4()
 
 
-def axangle_to_rotmat(vec):
-  """
-  Convert axis-angle rotation vector into rotation matrix.
-
-  Parameters
-  ----------
-  vec : np.ndarray, shape [3]
-    Rotation vector.
-
-  Returns
-  -------
-  np.ndarray, shape [3, 3]
-    Rotation matrix.
-  """
-  angle = np.linalg.norm(vec)
-  axis = vec / angle
-  return transforms3d.axangles.axangle2mat(axis, angle)
-
-
 def progress_bar(producer, text=None):
   if type(producer) == int:
     producer = range(producer)
@@ -570,120 +452,6 @@ def get_bbox(uv, scale, limit,
   return tl, br
 
 
-class ParallelReader:
-  def __init__(self, readers):
-    """
-    Always return the batch data of every reader concatenated along axis 0.
-
-    Parameters
-    ----------
-    readers : list
-      List of readers.
-    """
-    self.readers = readers
-    self.batch_size = sum([r.batch_size for r in readers], 0)
-
-  def next_batch(self):
-    packs = [r.next_batch() for r in self.readers]
-    batch_data = {}
-
-    for k in packs[0].keys():
-      batch_data[k] = np.concatenate([p[k] for p in packs], 0)
-    return batch_data
-
-
-class CascadeReader:
-  def __init__(self, readers):
-    """
-    Always return the batch data of only one reader from the readers.
-
-    Parameters
-    ----------
-    readers : list
-      List of readers.
-    """
-    self.readers = readers
-    self.batch_size = readers[0].batch_size
-    self.reader_idx = 0
-
-  def next_batch(self):
-    if self.reader_idx == len(self.readers):
-      self.reader_idx = 0
-    data = self.readers[self.reader_idx].next_batch()
-    self.reader_idx += 1
-    return data
-
-
-class DataLoader:
-  def __init__(self, data_dir, batch_size):
-    """
-    Data loader to load all data from the data dir.
-
-    Parameters
-    ----------
-    data_dir : str
-      Data folder.
-    batch_size : int
-      Batch size.
-    """
-    print_important('Data loader at %s, batch size %d.' % (data_dir, batch_size))
-    self.data_dir = data_dir
-    self.data_files = os.listdir(self.data_dir)
-    self.data_file_idx = 0
-    self.cache_idx = 0
-    self.batch_size = batch_size
-    self.cache = {}
-    self.cache_size = 0
-    self._load_cache()
-
-  def _load_cache(self):
-    if self.data_file_idx == len(self.data_files):
-      self.data_file_idx = 0
-    if self.data_file_idx == 0:
-      np.random.shuffle(self.data_files)
-    self.cache_idx = 0
-
-    load_success = False
-    while not load_success:
-      try:
-        self.cache = load_hdf5(
-          os.path.join(self.data_dir, self.data_files[self.data_file_idx])
-        )
-        load_success = True
-      except Exception as e:
-        print(e)
-        print(self.data_dir)
-        print(self.data_files[self.data_file_idx])
-        time.sleep(10)
-    self.data_file_idx += 1
-
-    self.cache_size = 0
-    for k, v in self.cache.items():
-      if self.cache_size == 0:
-        self.cache_size = v.shape[0]
-      else:
-        if self.cache_size != v.shape[0]:
-          print('Error: all the data should have the same size along axis 0.')
-          print('In %s - %s' % (self.data_files[self.data_file_idx - 1], k))
-          print('%d (expected) vs %d (practical)' % (self.cache_size, v.shape[0]))
-          exit(0)
-
-    shuffled_indices = np.random.permutation(self.cache_size)
-
-    for k, v in self.cache.items():
-      self.cache[k] = v[shuffled_indices]
-
-  def next_batch(self):
-    start = self.cache_idx
-    end = self.cache_idx + self.batch_size
-    if end > self.cache_size:
-      self._load_cache()
-      return self.next_batch()
-    self.cache_idx = end
-    data = {k: v[start:end] for k, v in self.cache.items()}
-    return data
-
-
 def press_to_continue(exit_0=True):
   """
   Wait for user input to continue. Enter 'n' to exit.
@@ -718,9 +486,6 @@ def examine_dict(data, indent=0):
       print(f'length = {len(v)}')
     else:
       print()
-
-
-inspect_dict = examine_dict
 
 
 def set_extension(file_name, ext):
