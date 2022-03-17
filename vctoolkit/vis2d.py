@@ -115,12 +115,10 @@ def render_bones_from_uv(uv, canvas, skeleton, valid='auto', colors=None, thickn
     thickness = int(max(round(canvas.shape[0] / 128), 1))
 
   if colors is None:
-    if hasattr(skeleton, colors):
+    if hasattr(skeleton, 'colors'):
       colors = skeleton.colors
     else:
       colors = [[255, 0, 0]] * len(skeleton.parents)
-
-  anyzero = lambda x: x[0] * x[1] == 0
 
   for child, parent in enumerate(skeleton.parents):
     if parent is None:
@@ -131,12 +129,8 @@ def render_bones_from_uv(uv, canvas, skeleton, valid='auto', colors=None, thickn
     end = (int(uv[child][1]), int(uv[child][0]))
 
     if valid is not None:
-      if valid == 'auto':
-        if anyzero(start) or anyzero(end):
-          continue
-      else:
-        if not valid[parent] or not valid[child]:
-          continue
+      if not valid[parent] or not valid[child]:
+        continue
 
     cv2.line(canvas, start, end, c, thickness)
   return canvas
