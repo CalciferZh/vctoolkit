@@ -88,7 +88,7 @@ def render_dots_from_uv(uv, canvas, id_label=False, radius=None):
   return canvas
 
 
-def render_bones_from_uv(uv, canvas, skeleton, color=None, thickness=None):
+def render_bones_from_uv(uv, canvas, skeleton, valid='auto', colors=None, thickness=None):
   """
   Render bones from joint uv coordinates.
 
@@ -98,10 +98,8 @@ def render_bones_from_uv(uv, canvas, skeleton, color=None, thickness=None):
     UV coordinates of joints.
   canvas : np.ndarray, dtype uint8
     Canvas to draw on.
-  parents : list
-    The parent joint for each joint. Root joint's parent should be None.
-  color : list
-    Color for each bone. A list of list in range [0, 255].
+  colors : list
+    Colors for each bone. A list of list in range [0, 255].
   thickness : int, optional
     Thickness of the line, by default None
 
@@ -116,28 +114,35 @@ def render_bones_from_uv(uv, canvas, skeleton, color=None, thickness=None):
   if thickness is None:
     thickness = int(max(round(canvas.shape[0] / 128), 1))
 
-  if color is None:
-    color = get_left_right_color(skeleton.labels)
+  if colors is None:
+    if hasattr(skeleton, colors):
+      colors = skeleton.colors
+    else:
+      colors = [[255, 0, 0]] * len(skeleton.parents)
 
-  for child, parent in enumerate(skeleton):
+  anyzero = lambda x: x[0] * x[1] == 0
+
+  for child, parent in enumerate(skeleton.parents):
     if parent is None:
       continue
-    if color is None:
-      c = color_lib[child % len(color_lib)]
     else:
-      c = color[child]
+      c = colors[child]
     start = (int(uv[parent][1]), int(uv[parent][0]))
     end = (int(uv[child][1]), int(uv[child][0]))
 
-    anyzero = lambda x: x[0] * x[1] == 0
-    if anyzero(start) or anyzero(end):
-      continue
+    if valid is not None:
+      if valid == 'auto':
+        if anyzero(start) or anyzero(end):
+          continue
+      else:
+        if not valid[parent] or not valid[child]:
+          continue
 
     cv2.line(canvas, start, end, c, thickness)
   return canvas
 
 
-def render_bones_from_hmap(hmap, canvas, parents, color=None, thickness=None):
+def render_bones_from_hmap(hmap, canvas, skeleton, colors=None, thickness=None):
   """
   Render bones from heat maps.
 
@@ -145,8 +150,6 @@ def render_bones_from_hmap(hmap, canvas, parents, color=None, thickness=None):
   ----------
   hmap : np.ndarray, shape [h, w, k]
     Heat maps.
-  canvas : np.ndarray, shape [h, w, 3], dtype uint8
-    Canvas to render.
   parents : list
     Parent joint of each child joint.
   thickness : int, optional
@@ -158,7 +161,7 @@ def render_bones_from_hmap(hmap, canvas, parents, color=None, thickness=None):
     Canvas after rendering.
   """
   coords = hmap_to_uv(hmap)
-  bones = render_bones_from_uv(coords, canvas, parents, color, thickness)
+  bones = render_bones_from_uv(coords, canvas, skeleton, colors, thickness)
   return bones
 
 

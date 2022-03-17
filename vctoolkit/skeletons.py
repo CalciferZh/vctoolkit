@@ -1,3 +1,35 @@
+def get_finger_color(labels):
+  color = []
+  for l in labels:
+    if 'T' in l:
+      c = [255, 0, 0]
+    elif 'I' in l:
+      c = [0, 255, 0]
+    elif 'M' in l:
+      c = [0, 0, 255]
+    elif 'R' in l:
+      c = [0, 255, 255]
+    elif 'L' in l:
+      c = [255, 0, 255]
+    else:
+      c = [255, 255, 0]
+    color.append(c)
+  return color
+
+
+def get_body_color(labels):
+  color = []
+  for l in labels:
+    if 'left' in l:
+      c = [255, 0, 0]
+    elif 'right' in l:
+      c = [0, 255, 0]
+    else:
+      c = [0, 0, 255]
+    color.append(c)
+  return color
+
+
 class BaseSkeleton:
   labels = []
 
@@ -39,6 +71,8 @@ class COCOBody(BaseSkeleton):
 
   center = root = None
 
+  colors = get_body_color(labels)
+
 
 class MPII2DBody(BaseSkeleton):
   n_keypoints = 16
@@ -60,6 +94,8 @@ class MPII2DBody(BaseSkeleton):
   ]
 
   center = root = 6
+
+  colors = get_body_color(labels)
 
 
 class MPII3DBody28(BaseSkeleton):
@@ -85,6 +121,8 @@ class MPII3DBody28(BaseSkeleton):
 
   center = root = 4
 
+  colors = get_body_color(labels)
+
 
 class MPII3DBody17(BaseSkeleton):
   n_keypoints = 17
@@ -109,6 +147,8 @@ class MPII3DBody17(BaseSkeleton):
 
   center = root = 14
 
+  colors = get_body_color(labels)
+
 
 class HM36MBody23(BaseSkeleton):
   labels = [
@@ -131,6 +171,8 @@ class HM36MBody23(BaseSkeleton):
 
   center = root = 0
 
+  colors = get_body_color(labels)
+
 
 class HM36MBody17(BaseSkeleton):
   labels = [
@@ -152,6 +194,8 @@ class HM36MBody17(BaseSkeleton):
   ]
 
   center = root = 0
+
+  colors = get_body_color(labels)
 
 
 class HUMBIBody33(BaseSkeleton):
@@ -215,6 +259,8 @@ class HUMBIBody33(BaseSkeleton):
     31: 6691, 32: 6718
   }
 
+  colors = get_body_color(labels)
+
 
 class MTCBody(BaseSkeleton):
   n_keypoints = 19
@@ -240,6 +286,8 @@ class MTCBody(BaseSkeleton):
   ]
 
   center = root = 2
+
+  colors = get_body_color(labels)
 
 
 class MANOHand(BaseSkeleton):
@@ -272,6 +320,8 @@ class MANOHand(BaseSkeleton):
     3, 6, 9, 12, 15
   ]
 
+  colors = get_finger_color(labels)
+
 
 class MPIIHand(BaseSkeleton):
   n_keypoints = 21
@@ -297,6 +347,8 @@ class MPIIHand(BaseSkeleton):
     0, 13, 14, 15,
     0, 17, 18, 19
   ]
+
+  colors = get_finger_color(labels)
 
 
 class SMPLH65(BaseSkeleton):
@@ -382,8 +434,10 @@ class SMPLH65(BaseSkeleton):
     62: 3255, 63: 6655, 64: 411
   }
 
+  colors = get_body_color(labels)
 
-class SMPL26(BaseSkeleton):
+
+class SMPLBody26(BaseSkeleton):
   n_keypoints = 26
 
   center = root = 0
@@ -431,14 +485,4 @@ class SMPL26(BaseSkeleton):
     24: 2445, 25: 5905
   }
 
-
-def get_left_right_bone_color(skeleton):
-  color = []
-  for l in skeleton.labels:
-    if 'left' in l:
-      color.append([255, 0, 0])
-    elif 'right' in l:
-      color.append([0, 255, 0])
-    else:
-      color.append([0, 0, 255])
-  return color
+  colors = get_body_color(labels)

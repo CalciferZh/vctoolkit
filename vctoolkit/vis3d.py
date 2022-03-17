@@ -4,7 +4,7 @@ from tqdm import tqdm
 from transforms3d.axangles import axangle2mat
 
 
-def joints_to_mesh(joints, parents, color=None, thickness=0.2, save_path=None):
+def joints_to_mesh(joints, skeleton, colors=None, thickness=0.2, save_path=None):
   """
   Produce a mesh representing the skeleton with given joint coordinates.
   Bones are represented by prisms.
@@ -13,10 +13,8 @@ def joints_to_mesh(joints, parents, color=None, thickness=0.2, save_path=None):
   ----------
   joints : np.ndarray, shape [k, 3]
     Joint coordinates.
-  parents : list
-    Parent joint of each child joint.
-  color : list
-    Color for each bone. A list of list in range [0, 255].
+  colors : list
+    Colors for each bone. A list of list in range [0, 255].
   thickness : float, optional
     The thickness of the bone relative to length, by default 0.2
 
@@ -27,12 +25,15 @@ def joints_to_mesh(joints, parents, color=None, thickness=0.2, save_path=None):
   np.ndarray, shape [f, 3]
     Face indices of the mesh.
   """
-  n_bones = len(list(filter(lambda x: x is not None, parents)))
+  if colors is None and hasattr(skeleton, colors):
+    colors = skeleton.colors
+
+  n_bones = len(list(filter(lambda x: x is not None, skeleton)))
   faces = np.empty([n_bones * 8, 3], dtype=np.int32)
   verts = np.empty([n_bones * 6, 3], dtype=np.float32)
   face_color = []
   bone_idx = -1
-  for child, parent in enumerate(parents):
+  for child, parent in enumerate(skeleton):
     if parent is None:
       continue
     bone_idx += 1
@@ -77,11 +78,11 @@ def joints_to_mesh(joints, parents, color=None, thickness=0.2, save_path=None):
     faces[bone_idx*8+7] = \
       np.flip(np.array([1, 2, 5], dtype=np.int32), axis=0) + bone_idx * 6
 
-    if color is not None:
+    if colors is not None:
       for _ in range(8):
-        face_color.append(color[child])
+        face_color.append(colors[child])
 
-  if color is not None:
+  if colors is not None:
     return verts, faces, face_color
 
   if save_path is not None:
