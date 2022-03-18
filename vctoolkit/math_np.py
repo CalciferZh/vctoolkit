@@ -209,3 +209,35 @@ def forward_kinematics(ref_bones, abs_rotmat, parents, batch=False):
     bones = bones[0]
     keypoints = keypoints[0]
   return keypoints, bones
+
+
+def sphere_sampling(n):
+  theta = np.random.uniform(0, 2 * np.pi, size=n)
+  phi = np.random.uniform(0, np.pi, size=n)
+  v = np.stack(
+    [np.cos(theta) * np.sin(phi), np.sin(theta) * np.sin(phi), np.cos(phi)], 1
+  )
+  return v
+
+
+def random_rotation(n):
+  axis = sphere_sampling(n)
+  angle = np.random.uniform(np.pi, size=[n, 1])
+  return convert(axis * angle, 'axangle', 'rotmat')
+
+
+def slerp(a, b, t, batch=False):
+  if not batch:
+    a = np.expand_dims(a, 0)
+    b = np.expand_dims(b, 0)
+  dot = np.einsum('njd, njd -> nj', a, b)
+  omega = np.expand_dims(np.arccos(np.clip(dot, 0, 1), dtype=np.float32), -1)
+  so = np.sin(omega, dtype=np.float32)
+  so[so == 0] = np.finfo(np.float32).eps
+  p = np.sin((1 - t) * omega, dtype=np.float32) / so * a + \
+      np.sin(t * omega, dtype=np.float32) / so * b
+  mask = np.tile(np.prod(a == b, axis=-1, keepdims=True, dtype=np.bool), (1, 4))
+  p = np.where(mask, a, p)
+  if not batch:
+    p = p[0]
+  return p

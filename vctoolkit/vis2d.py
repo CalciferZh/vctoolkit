@@ -195,6 +195,21 @@ def render_bones_plt(joints, parents):
   plt.show()
 
 
+def put_text(img, text, origin=None, color=(0, 255, 0)):
+  """
+  origin : tuple, optional
+    (x, y), by default None
+  """
+  font = cv2.FONT_HERSHEY_DUPLEX
+  size = int(math.ceil(max(img.shape) / 128))
+  box = cv2.getTextSize(text, fontFace=font, fontScale=size, thickness=size)
+  if origin is None:
+    origin = (10, 10)
+  origin = (origin[0], origin[1] + box[1])
+  cv2.putText(img, text, origin, font, size, color=color, thickness=size)
+  return img
+
+
 def select_frames_from_video(video_path, save_prefix=None, fps=60, scale=1):
   """
   Read video, display frame by frame, and save selected frames.

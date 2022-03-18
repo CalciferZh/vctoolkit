@@ -53,44 +53,63 @@ class LBSMesh():
     self.n_faces = self.faces.shape[0]
     self.dtype = dtype
 
-  def pose_parent_to_children(self, pose):
+  def pose_parent_to_children(self, pose, batch=False):
+    if not batch:
+      pose = np.expand_dims(pose, 0)
+
     # convert pose from children style to parent style
-    outputs = [np.zeros(3) for _ in range(self.skeleton.n_keypoints)]
+    outputs = [
+      np.zeros(pose.shape[0], 3) for _ in range(self.skeleton.n_keypoints)
+    ]
     for c, p in enumerate(self.parents):
       if p is not None:
         outputs[c] = pose[p]
-    return np.stack(outputs)
+    outputs = np.stack(outputs, 1)
+
+    if not batch:
+      outputs = outputs[0]
+
+    return outputs
 
   def set_params(self, pose=None, shape=None, format='rotmat', relative=False,
-                 reference='child', use_j_regressor=False):
-    verts = self.mesh.copy()
-    if shape is not None:
-      verts = verts + np.einsum('c, vdc -> vd', shape, self.shape_std)
+                 reference='child', use_j_regressor=False, batch=False):
+    if not batch:
+      if pose is not None:
+        pose = np.expand_dims(pose)
+      if shape is not None:
+        shape = np.expand_dims(shape)
 
-    keypoints = np.einsum('vd, jv -> jd', verts, self.j_regressor)
+    verts = np.expand_dims(self.mesh.copy(), 0)
+
+    if shape is not None:
+      verts = verts + np.einsum('nc, vdc -> nvd', shape, self.shape_std)
+
+    keypoints = np.einsum('nvd, jv -> njd', verts, self.j_regressor)
+
     if pose is None:
       return verts, keypoints
 
     if reference == 'parent':
-      pose = self.pose_parent_to_children(pose)
+      pose = self.pose_parent_to_children(pose, batch=True)
 
     if format != 'rotmat':
       pose = math_np.convert(pose, format, 'rotmat')
 
     if relative:
-      pose = math_np.rotmat_rel_to_abs(pose, self.parents)
+      pose = math_np.rotmat_rel_to_abs(pose, self.parents, batch=True)
 
-    bones = math_np.keypoints_to_bones(keypoints, self.parents)
+    bones = math_np.keypoints_to_bones(keypoints, self.parents, batch=True)
     posed_keypoints, _ = \
-      math_np.forward_kinematics(bones, pose, self.parents)
-    j_mat = posed_keypoints - np.einsum('jhw, jw -> jh', pose, keypoints)
+      math_np.forward_kinematics(bones, pose, self.parents, batch=True)
+    j_mat = posed_keypoints - np.einsum('njhw, njw -> njh', pose, keypoints)
     g_mat = np.concatenate([pose, np.expand_dims(j_mat, -1)], -1)
     verts = np.concatenate([verts, self.ones], 1)
     posed_verts = np.einsum(
-      'vj, jvd -> vd',
-      self.skinning_weights, np.einsum('jhw, vw -> jvh', g_mat, verts)
+      'vj, njvd -> nvd',
+      self.skinning_weights, np.einsum('njhw, nvw -> njvh', g_mat, verts)
     )
     if use_j_regressor:
-      posed_keypoints = np.dot(self.j_regressor, posed_verts)
+      posed_keypoints = \
+        np.einsum('jv, nvd -> njd', self.j_regressor, posed_verts)
 
     return posed_keypoints, posed_verts
