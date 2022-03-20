@@ -88,7 +88,8 @@ def render_dots_from_uv(uv, canvas, id_label=False, radius=None):
   return canvas
 
 
-def render_bones_from_uv(uv, canvas, skeleton, valid='auto', colors=None, thickness=None):
+def render_bones_from_uv(uv, canvas, skeleton, valid=None, colors=None,
+                         thickness=None, save_path=None):
   """
   Render bones from joint uv coordinates.
 
@@ -133,10 +134,15 @@ def render_bones_from_uv(uv, canvas, skeleton, valid='auto', colors=None, thickn
         continue
 
     cv2.line(canvas, start, end, c, thickness)
+
+  if save_path is not None:
+    save(save_path, canvas)
+
   return canvas
 
 
-def render_bones_from_hmap(hmap, canvas, skeleton, colors=None, thickness=None):
+def render_bones_from_hmap(hmap, canvas, skeleton, valid=None, colors=None,
+                           thickness=None, save_path=None):
   """
   Render bones from heat maps.
 
@@ -155,7 +161,9 @@ def render_bones_from_hmap(hmap, canvas, skeleton, colors=None, thickness=None):
     Canvas after rendering.
   """
   coords = hmap_to_uv(hmap)
-  bones = render_bones_from_uv(coords, canvas, skeleton, colors, thickness)
+  bones = render_bones_from_uv(
+    coords, canvas, skeleton, valid, colors, thickness, save_path
+  )
   return bones
 
 
@@ -208,79 +216,6 @@ def put_text(img, text, origin=None, color=(0, 255, 0)):
   origin = (origin[0], origin[1] + box[1])
   cv2.putText(img, text, origin, font, size, color=color, thickness=size)
   return img
-
-
-def select_frames_from_video(video_path, save_prefix=None, fps=60, scale=1):
-  """
-  Read video, display frame by frame, and save selected frames.
-
-  w: previous frame
-  s: next frame
-  a: revert
-  d: forward
-  q: quit
-  space: save this frame
-
-  Parameters
-  ----------
-  video_path : str
-    Path to the video.
-  save_prefix : str, optional
-    Path prefix to save the frames, if None, will be the same as video_path,
-    by default None
-  fps : int, optional
-    Display framerate, by default 60
-  scale : float
-    Display scale of the video frames, by default 1
-  """
-  import pygame
-
-  if save_prefix is None:
-    save_prefix = video_path
-
-  reader = VideoReader(video_path)
-  frames = reader.all_frames()
-  reader.close()
-
-  display_size = \
-    (int(frames[0].shape[1] * scale), int(frames[0].shape[0] * scale))
-
-  pygame.init()
-  display = pygame.display.set_mode(display_size)
-  pygame.display.set_caption('loading')
-
-  idx = 0
-  done = False
-  clock = pygame.time.Clock()
-  while not done:
-    for event in pygame.event.get():
-      if event.type == pygame.QUIT:
-        done = True
-      elif event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_w:
-          idx -= 1
-        elif event.key == pygame.K_s:
-          idx += 1
-        elif event.key == pygame.K_SPACE:
-          imsave('./frame_%d' % idx + '.png')
-        elif event.key == pygame.K_q:
-          done = True
-    pressed = pygame.key.get_pressed()
-    if pressed[pygame.K_a]:
-      idx -= 1
-    if pressed[pygame.K_d]:
-      idx += 1
-
-    idx = min(max(idx, 0), len(frames) - 1)
-    pygame.display.set_caption('%s %d/%d' % (video_path, idx, len(frames)))
-    display.blit(
-      pygame.surfarray.make_surface(
-        imresize(frames[idx], display_size).transpose((1, 0, 2))
-      ), (0, 0)
-    )
-    pygame.display.update()
-
-    clock.tick(fps)
 
 
 def concat_videos(src_paths, tar_path, height=None, width=None):
