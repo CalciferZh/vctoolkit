@@ -1,11 +1,12 @@
 import open3d as o3d
 import numpy as np
 from ..io import VideoWriter
+from ..misc import progress_bar
 from tqdm import tqdm
 
 
 def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
-                       visible=False, need_norm=True):
+                       visible=False, need_norm=True, verbose=True, colors=None):
   """
   Render mesh animation using open3d.
 
@@ -58,9 +59,14 @@ def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
   ])
   view_control.convert_from_pinhole_camera_parameters(cam_params)
 
-  for v in tqdm(verts, ascii=True):
-    mesh.vertices = o3d.utility.Vector3dVector(v)
+  iterations = range(len(verts))
+  if verbose:
+    iterations = progress_bar(iterations)
+  for idx in iterations:
+    mesh.vertices = o3d.utility.Vector3dVector(verts[idx])
     mesh.compute_vertex_normals()
+    if colors is not None:
+      mesh.vertex_colors = o3d.utility.Vector3dVector(colors[idx])
     vis.update_geometry(mesh)
     vis.poll_events()
     vis.update_renderer()

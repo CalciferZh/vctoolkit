@@ -362,7 +362,7 @@ class VideoWriter:
   Call `close` to release resource.
 
   """
-  def __init__(self, path, width, height, fps, codec='H264'):
+  def __init__(self, path, width, height, fps, codec='avc1'):
     """
     Parameters
     ----------
