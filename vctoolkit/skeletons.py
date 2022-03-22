@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def get_finger_color(labels):
   color = []
   for l in labels:
@@ -28,6 +31,15 @@ def get_body_color(labels):
       c = [0, 0, 255]
     color.append(c)
   return color
+
+
+def convert_skeleton(data, src_skeleton, tgt_skeleton, axis=0):
+  src_data = np.swapaxes(data, 0, axis)
+  tgt_data = []
+  for l in tgt_skeleton.labels:
+    tgt_data.append(src_data[src_skeleton.labels.index(l)])
+  tgt_data = np.swapaxes(np.stack(tgt_data), 0, axis).copy()
+  return tgt_data
 
 
 class BaseSkeleton:

@@ -232,15 +232,13 @@ def slerp(a, b, t):
   b = np.reshape(b, [-1, 4])
   t = np.reshape(t, [-1, 1])
 
-  dot = np.abs(np.einsum('nd, nd -> n', a, b))
+  dot = np.einsum('nd, nd -> n', a, b)
   omega = np.expand_dims(np.arccos(np.clip(dot, -1, 1), dtype=np.float32), -1)
   so = np.sin(omega, dtype=np.float32)
   so[so == 0] = np.finfo(np.float32).eps
   p = np.sin((1 - t) * omega, dtype=np.float32) / so * a + \
       np.sin(t * omega, dtype=np.float32) / so * b
-  mask = np.tile(
-    np.prod(a == b, axis=-1, keepdims=True, dtype=np.bool), (1, 4)
-  )
+  mask = np.expand_dims(np.abs(dot) >= 1, -1)
   p = np.where(mask, a, p)
 
   p = np.reshape(p, shape + [4])
