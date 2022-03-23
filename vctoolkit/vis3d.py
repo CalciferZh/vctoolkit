@@ -25,9 +25,6 @@ def joints_to_mesh(joints, skeleton, colors=None, thickness=0.2, save_path=None)
   np.ndarray, shape [f, 3]
     Face indices of the mesh.
   """
-  if colors is None and hasattr(skeleton, 'colors'):
-    colors = skeleton.colors
-
   n_bones = len(list(filter(lambda x: x is not None, skeleton.parents)))
   faces = np.empty([n_bones * 8, 3], dtype=np.int32)
   verts = np.empty([n_bones * 6, 3], dtype=np.float32)
@@ -82,10 +79,10 @@ def joints_to_mesh(joints, skeleton, colors=None, thickness=0.2, save_path=None)
       for _ in range(8):
         face_color.append(colors[child])
 
-  if colors is not None:
-    return verts, faces, face_color
-
   if save_path is not None:
     save(save_path, (verts, faces))
+
+  if colors is not None:
+    return verts, faces, face_color
 
   return verts, faces

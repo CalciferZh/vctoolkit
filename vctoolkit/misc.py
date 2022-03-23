@@ -77,7 +77,7 @@ def imresize_diag(img, w=None, h=None):
   return imresize(img, (w, h))
 
 
-def render_gaussian_hmap(centers, shape, sigma=None):
+def render_gaussian_hmap(centers, shape, sigma=None, dtype=np.float32):
   """
   Render gaussian heat maps from given centers.
 
@@ -100,15 +100,14 @@ def render_gaussian_hmap(centers, shape, sigma=None):
   x = [i for i in range(shape[1])]
   y = [i for i in range(shape[0])]
   xx, yy = np.meshgrid(x, y)
-  xx = np.reshape(xx.astype(np.float32), [shape[0], shape[1], 1])
-  yy = np.reshape(yy.astype(np.float32), [shape[0], shape[1], 1])
+  xx = np.reshape(xx.astype(dtype), [shape[0], shape[1], 1])
+  yy = np.reshape(yy.astype(dtype), [shape[0], shape[1], 1])
   x = np.reshape(centers[:,1], [1, 1, -1])
   y = np.reshape(centers[:,0], [1, 1, -1])
-  distance = np.square(xx - x) + np.square(yy - y)
-  hmap = np.exp(-distance / (2 * sigma**2 )) / np.sqrt(2 * np.pi * sigma**2)
-  hmap /= (
-    np.max(hmap, axis=(0, 1), keepdims=True) + np.finfo(np.float32).eps
-  )
+  distance = np.square(xx - x, dtype=dtype) + np.square(yy - y, dtype=dtype)
+  hmap = np.exp(-distance / (2 * sigma**2 ), dtype=dtype) / \
+         np.sqrt(2 * np.pi * sigma**2, dtype=dtype)
+  hmap /= (np.max(hmap, axis=(0, 1), keepdims=True) + np.finfo(dtype).eps)
   return hmap
 
 
@@ -479,6 +478,8 @@ def examine_dict(data, indent=0):
     print('  ' * indent, k, type(v), end=', ')
     if hasattr(v, 'shape'):
       print(f'shape = {v.shape}')
+      if hasattr(v,'dtype'):
+        print(f' | dtype = {v.dtype}')
     elif type(v) == dict:
       print()
       examine_dict(v, indent + 1)
@@ -494,4 +495,3 @@ def set_extension(file_name, ext):
 
 def count_model_parameters(model):
   return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
