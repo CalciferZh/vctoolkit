@@ -213,7 +213,7 @@ class HM36MBody17(BaseSkeleton):
 class HM36MBody32(BaseSkeleton):
   labels = [
     'pelvis', # 0
-    'right_hip', 'right_knee', 'right_ankle', 'right_foot', 'right_toe' # 5
+    'right_hip', 'right_knee', 'right_ankle', 'right_foot', 'right_toe', # 5
     'left_hip', 'left_knee', 'left_ankle', 'left_foot', 'left_toe', # 10
     'pelvis_duplicate', 'spine', 'neck', 'head', 'head_top', # 15
     'unknown', # 16
