@@ -477,16 +477,15 @@ def examine_dict(data, indent=0):
   for k, v in data.items():
     print('  ' * indent, k, type(v), end=', ')
     if hasattr(v, 'shape'):
-      print(f'shape = {v.shape}')
+      print(f'shape = {v.shape}', end='')
       if hasattr(v,'dtype'):
-        print(f' | dtype = {v.dtype}')
+        print(f', dtype = {v.dtype}', end='')
     elif type(v) == dict:
       print()
       examine_dict(v, indent + 1)
     elif hasattr(v, '__len__'):
-      print(f'length = {len(v)}')
-    else:
-      print()
+      print(f'length = {len(v)}', end='')
+    print()
 
 
 def set_extension(file_name, ext):

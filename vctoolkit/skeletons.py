@@ -210,6 +210,46 @@ class HM36MBody17(BaseSkeleton):
   colors = get_body_color(labels)
 
 
+class HM36MBody32(BaseSkeleton):
+  labels = [
+    'pelvis', # 0
+    'right_hip', 'right_knee', 'right_ankle', 'right_foot', 'right_toe' # 5
+    'left_hip', 'left_knee', 'left_ankle', 'left_foot', 'left_toe', # 10
+    'pelvis_duplicate', 'spine', 'neck', 'head', 'head_top', # 15
+    'unknown', # 16
+    'left_shoulder', 'left_elbow', 'left_wrist', # 19
+    'unknown', 'unknown', # 21
+    'left_hand', # 22
+    'unknown', 'unknown', # 24
+    'right_shoulder', 'right_elbow', 'right_wrist', # 27
+    'unknown', 'unknown', # 29
+    'right_hand', # 30
+    'unknown', 'unknown', # 32
+  ]
+
+  n_keypoints = 32
+
+  parents = [
+    None,
+    0, 1, 2, 3, 4,
+    0, 6, 7, 8, 9,
+    None, 0, 12, 13, 14,
+    None,
+    12, 17, 18,
+    None, None,
+    19,
+    None, None,
+    12, 25, 26,
+    None, None,
+    27,
+    None, None
+  ]
+
+  center = root = 0
+
+  colors = get_body_color(labels)
+
+
 class HUMBIBody33(BaseSkeleton):
   n_keypoints = 33
 
