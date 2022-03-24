@@ -552,10 +552,10 @@ class LSPBody(BaseSkeleton):
   ]
 
   parents = [
-    1, 2, 12,
-    6, 3, 12,
-    11, 12, 7,
-    7, 9, 10,
+    1, 2, None,
+    None, 3, 4,
+    7, 8, 12,
+    12, 9, 10,
     None, 12
   ]
 
