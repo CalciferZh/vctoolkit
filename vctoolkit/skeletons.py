@@ -555,7 +555,7 @@ class LSPBody(BaseSkeleton):
     1, 2, 12,
     6, 3, 12,
     11, 12, 7,
-    7, 13, 14,
+    7, 9, 10,
     None, 12
   ]
 
