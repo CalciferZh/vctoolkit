@@ -547,7 +547,7 @@ class LSPBody(BaseSkeleton):
     'right_ankle', 'right_knee', 'right_hip', # 2
     'left_hip', 'left_knee', 'left_ankle', # 5
     'right_wrist', 'right_elbow', 'right_shoulder', # 8
-    'left_shoulder', 'left_elbow', 'left_wrist' # 11
+    'left_shoulder', 'left_elbow', 'left_wrist', # 11
     'neck', 'head_top' # 13
   ]
 
