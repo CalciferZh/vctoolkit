@@ -538,3 +538,27 @@ class SMPLBody26(BaseSkeleton):
   }
 
   colors = get_body_color(labels)
+
+
+class LSPBody(BaseSkeleton):
+  n_keypoints = 14
+
+  labels = [
+    'right_ankle', 'right_knee', 'right_hip', # 2
+    'left_hip', 'left_knee', 'left_ankle', # 5
+    'right_wrist', 'right_elbow', 'right_shoulder', # 8
+    'left_shoulder', 'left_elbow', 'left_wrist' # 11
+    'neck', 'head_top' # 13
+  ]
+
+  parents = [
+    1, 2, 12,
+    6, 3, 12,
+    11, 12, 7,
+    7, 13, 14,
+    None, 12
+  ]
+
+  center = root = 12
+
+  colors = get_body_color(labels)
