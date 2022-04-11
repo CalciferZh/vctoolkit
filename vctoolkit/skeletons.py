@@ -403,6 +403,34 @@ class MPIIHand(BaseSkeleton):
   colors = get_finger_color(labels)
 
 
+class RHDHand(BaseSkeleton):
+  n_keypoints = 21
+
+  center = 9
+
+  root = 0
+
+  labels = [
+    'W', #0
+    'T3', 'T2', 'T1', 'T0', #4
+    'I3', 'I2', 'I1', 'I0', #4
+    'M3', 'M2', 'M1', 'M0', #4
+    'R3', 'R2', 'R1', 'R0', #4
+    'L3', 'L2', 'L1', 'L0', #4
+  ]
+
+  parents = [
+    None,
+    2, 3, 4, 0, # 4
+    6, 7, 8, 0, # 8
+    10, 11, 12, 0, # 12
+    14, 15, 16, 0, # 16
+    18, 19, 20, 0, # 20
+  ]
+
+  colors = get_finger_color(labels)
+
+
 class SMPLH65(BaseSkeleton):
   n_keypoints = 65
 
