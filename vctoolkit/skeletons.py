@@ -342,6 +342,58 @@ class MTCBody(BaseSkeleton):
   colors = get_body_color(labels)
 
 
+class MTCWholeBody(BaseSkeleton):
+  n_keypoints = 61
+
+  labels = [
+    'neck', 'nose', 'pelvis', # 2
+    'left_shoulder', 'left_elbow', 'left_wrist', # 5
+    'left_hip', 'left_knee', 'left_ankle', # 8
+    'right_shoulder', 'right_elbow', 'right_wrist', # 11
+    'right_hip', 'right_knee', 'right_ankle', # 14
+    'left_eye', 'left_ear', # 16
+    'right_eye', 'right_ear', # 18
+    'left_W', # 19
+    'left_T0', 'left_T1', 'left_T2', 'left_T3', # 23
+    'left_I0', 'left_I1', 'left_I2', 'left_I3',
+    'left_M0', 'left_M1', 'left_M2', 'left_M3',
+    'left_R0', 'left_R1', 'left_R2', 'left_R3',
+    'left_L0', 'left_L1', 'left_L2', 'left_L3', # 39
+    'right_W', # 40
+    'right_T0', 'right_T1', 'right_T2', 'right_T3', # 44
+    'right_I0', 'right_I1', 'right_I2', 'right_I3',
+    'right_M0', 'right_M1', 'right_M2', 'right_M3',
+    'right_R0', 'right_R1', 'right_R2', 'right_R3',
+    'right_L0', 'right_L1', 'right_L2', 'right_L3', # 60
+  ]
+
+  parents = [
+    2, 0, None,
+    0, 3, 4,
+    2, 6, 7,
+    0, 9, 10,
+    2, 12, 13,
+    1, 15,
+    1, 17,
+    4,
+    19, 20, 21, 22,
+    19, 24, 25, 26,
+    19, 28, 29, 30,
+    19, 32, 33, 34,
+    19, 36, 37, 38,
+    10,
+    40, 41, 42, 43,
+    40, 45, 46, 47,
+    40, 49, 50, 51,
+    40, 53, 54, 55,
+    40, 57, 58, 59
+  ]
+
+  center = root = 2
+
+  colors = get_body_color(labels)
+
+
 class MANOHand(BaseSkeleton):
   n_keypoints = 21
 
