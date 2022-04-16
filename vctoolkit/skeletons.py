@@ -66,7 +66,7 @@ class COCOBody(BaseSkeleton):
     "left_wrist", "right_wrist", # 10
     "left_hip", "right_hip", # 12
     "left_knee", "right_knee", # 14
-    "left_ankle", "right_ankle" # 17
+    "left_ankle", "right_ankle" # 16
   ]
 
   parents = [
@@ -390,6 +390,62 @@ class MTCWholeBody(BaseSkeleton):
   ]
 
   center = root = 2
+
+  colors = get_body_color(labels)
+
+
+class COCOWholeBody(BaseSkeleton):
+  n_keypoints = 59
+
+  labels = [
+    "nose", # 0
+    "left_eye", "right_eye", # 2
+    "left_ear", "right_ear", # 4
+    "left_shoulder", "right_shoulder", # 6
+    "left_elbow", "right_elbow", # 8
+    "left_wrist", "right_wrist", # 10
+    "left_hip", "right_hip", # 12
+    "left_knee", "right_knee", # 14
+    "left_ankle", "right_ankle", # 16
+    'left_W', # 17
+    'left_T0', 'left_T1', 'left_T2', 'left_T3', # 21
+    'left_I0', 'left_I1', 'left_I2', 'left_I3',
+    'left_M0', 'left_M1', 'left_M2', 'left_M3',
+    'left_R0', 'left_R1', 'left_R2', 'left_R3',
+    'left_L0', 'left_L1', 'left_L2', 'left_L3', # 37
+    'right_W', # 38
+    'right_T0', 'right_T1', 'right_T2', 'right_T3', # 42
+    'right_I0', 'right_I1', 'right_I2', 'right_I3',
+    'right_M0', 'right_M1', 'right_M2', 'right_M3',
+    'right_R0', 'right_R1', 'right_R2', 'right_R3',
+    'right_L0', 'right_L1', 'right_L2', 'right_L3', # 58
+  ]
+
+  parents = [
+    None,
+    0, 0,
+    1, 2,
+    None, None,
+    5, 6,
+    7, 8,
+    None, None,
+    11, 12,
+    13, 14,
+    7,
+    17, 18, 19, 20,
+    17, 22, 23, 24,
+    17, 26, 27, 28,
+    17, 30, 31, 32,
+    17, 34, 35, 36,
+    8,
+    38, 39, 40, 41,
+    38, 43, 44, 45,
+    38, 47, 48, 49,
+    38, 51, 52, 53,
+    38, 55, 56, 57,
+  ]
+
+  center = root = 0
 
   colors = get_body_color(labels)
 
