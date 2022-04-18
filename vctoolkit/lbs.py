@@ -27,7 +27,7 @@ class LBSMesh():
     for k, v in skeleton.extended_keypoints.items():
       self.j_regressor[k, v] = 1
     self.keypoints_std = np.einsum(
-      'vdc, jv -> vjd', np.array(data['shapedirs'], dtype), self.j_regressor
+      'vdc, jv -> cjd', np.array(data['shapedirs'], dtype), self.j_regressor
     )
 
     self.parents = skeleton.parents
@@ -47,7 +47,7 @@ class LBSMesh():
 
     self.faces = data['f']
     self.shape_std = np.array(data['shapedirs'], dtype)
-    self.ones = np.ones([self.n_verts, 1], dtype)
+    self.ones = np.ones([1, self.n_verts, 1], dtype)
     self.skeleton = skeleton
     self.shape_dim = self.shape_std[-1]
     self.n_faces = self.faces.shape[0]
@@ -75,9 +75,9 @@ class LBSMesh():
                  reference='child', use_j_regressor=False, batch=False):
     if not batch:
       if pose is not None:
-        pose = np.expand_dims(pose)
+        pose = np.expand_dims(pose, 0)
       if shape is not None:
-        shape = np.expand_dims(shape)
+        shape = np.expand_dims(shape, 0)
 
     verts = np.expand_dims(self.mesh.copy(), 0)
 
@@ -103,7 +103,7 @@ class LBSMesh():
       math_np.forward_kinematics(bones, pose, self.parents, batch=True)
     j_mat = posed_keypoints - np.einsum('njhw, njw -> njh', pose, keypoints)
     g_mat = np.concatenate([pose, np.expand_dims(j_mat, -1)], -1)
-    verts = np.concatenate([verts, self.ones], 1)
+    verts = np.concatenate([verts, np.tile(self.ones, [pose.shape[0], 1, 1])], -1)
     posed_verts = np.einsum(
       'vj, njvd -> nvd',
       self.skinning_weights, np.einsum('njhw, nvw -> njvh', g_mat, verts)
@@ -111,5 +111,9 @@ class LBSMesh():
     if use_j_regressor:
       posed_keypoints = \
         np.einsum('jv, nvd -> njd', self.j_regressor, posed_verts)
+
+    if not batch:
+      posed_keypoints = posed_keypoints[0]
+      posed_verts = posed_verts[0]
 
     return posed_keypoints, posed_verts
