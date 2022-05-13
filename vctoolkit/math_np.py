@@ -243,3 +243,49 @@ def slerp(a, b, t):
 
   p = np.reshape(p, shape + [4])
   return p
+
+
+def procrustes_align(s1, s2):
+  """
+  Procrustes alignment.
+
+  Parameters
+  ----------
+  s1 : [N, 3]
+    Array to align from.
+  s2 : [N, 3]
+    Array to align to.
+
+  Returns
+  -------
+  [N, 3]
+    s1 after alignment.
+  """
+  if s1.shape[0] <= 2:
+    return s2.copy();
+
+  s1 = s1.T
+  s2 = s2.T
+
+  m1 = s1.mean(axis=1, keepdims=True)
+  m2 = s2.mean(axis=1, keepdims=True)
+  x1 = s1 - m1
+  x2 = s2 - m2
+
+  var1 = np.sum(x1**2)
+
+  K = x1.dot(x2.T)
+
+  U, _, Vh = np.linalg.svd(K)
+  V = Vh.T
+  Z = np.eye(U.shape[0])
+  Z[-1, -1] *= np.sign(np.linalg.det(U.dot(V.T)))
+  R = V.dot(Z.dot(U.T))
+
+  scale = np.trace(R.dot(K)) / var1
+
+  t = m2 - scale * (R.dot(m1))
+
+  s1_hat = scale * R.dot(s1) + t
+
+  return s1_hat.T
