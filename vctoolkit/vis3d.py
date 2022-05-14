@@ -4,7 +4,7 @@ from tqdm import tqdm
 from transforms3d.axangles import axangle2mat
 
 
-def joints_to_mesh(joints, skeleton, colors=None, thickness=0.2, save_path=None):
+def joints_to_mesh(joints, skeleton, colors=None, thickness=0.2, save_path=None, valid=None):
   """
   Produce a mesh representing the skeleton with given joint coordinates.
   Bones are represented by prisms.
@@ -25,13 +25,19 @@ def joints_to_mesh(joints, skeleton, colors=None, thickness=0.2, save_path=None)
   np.ndarray, shape [f, 3]
     Face indices of the mesh.
   """
+  if valid is None:
+    valid = np.ones(joints.shape[0], np.bool)
   n_bones = len(list(filter(lambda x: x is not None, skeleton.parents)))
+  # since some keypoints are invalid, the rendered bones will be less
+  # this is the maximum buffer
   faces = np.empty([n_bones * 8, 3], dtype=np.int32)
   verts = np.empty([n_bones * 6, 3], dtype=np.float32)
   face_color = []
   bone_idx = -1
   for child, parent in enumerate(skeleton.parents):
     if parent is None:
+      continue
+    if not (valid[child] and valid[parent]):
       continue
     bone_idx += 1
     a = joints[parent]
@@ -78,6 +84,10 @@ def joints_to_mesh(joints, skeleton, colors=None, thickness=0.2, save_path=None)
     if colors is not None:
       for _ in range(8):
         face_color.append(colors[child])
+
+  # since some keypoints are invalid, the rendered bones will be less
+  faces = faces[:(bone_idx + 1)*8]
+  verts = verts[:(bone_idx + 1)*6]
 
   if save_path is not None:
     save(save_path, (verts, faces))
