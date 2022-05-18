@@ -303,7 +303,7 @@ class HUMBIBody33(BaseSkeleton):
   center = root = 0
 
   # the vertex indices of the extended keypoints
-  extended_verts = {
+  extended_keypoints = {
     22: 411, 23: 2800, 24: 6260,
     25: 2135, 26: 2062,
     27: 5595, 28: 5525,
@@ -713,6 +713,72 @@ class SMPLBody26(BaseSkeleton):
   # the vertex indices of the extended keypoints
   extended_keypoints = {
     24: 2445, 25: 5905
+  }
+
+  colors = get_body_color(labels)
+
+
+class SMPLBody35(BaseSkeleton):
+  n_keypoints = 35
+
+  labels = [
+    'pelvis', # 0
+    'left_hip', 'right_hip', # 2
+    'lowerback', # 3
+    'left_knee', 'right_knee', # 5
+    'upperback', # 6
+    'left_ankle', 'right_ankle', # 8
+    'thorax', # 9
+    'left_toes', 'right_toes', # 11
+    'lowerneck', # 12
+    'left_clavicle', 'right_clavicle', # 14
+    'upperneck', # 15
+    'left_shoulder', 'right_shoulder', # 17
+    'left_elbow', 'right_elbow', # 19
+    'left_wrist', 'right_wrist', # 21
+    'left_hand', 'right_hand', # 23
+    # the fake hand joints in SMPL are removed
+    # following are extended keypoints
+    'head_top', 'left_eye', 'right_eye', # 26
+    'left_hand_I0', 'left_hand_L0', # 28
+    'right_hand_I0', 'right_hand_L0', # 30
+    'left_foot_T0', 'left_foot_L0', # 32
+    'right_foot_T0', 'right_foot_L0', # 34
+  ]
+
+  parents = [
+    None,
+    0, 0,
+    0,
+    1, 2,
+    3,
+    4, 5,
+    6,
+    7, 8,
+    9,
+    9, 9,
+    12,
+    13, 14,
+    16, 17,
+    18, 19,
+    20, 21,
+    # extended
+    15, 15, 15,
+    22, 22,
+    23, 23,
+    10, 10,
+    11, 11
+  ]
+
+  center = root = 0
+
+  # the vertex indices of the extended keypoints
+  extended_keypoints = {
+    24: 411, 25: 2800, 26: 6260,
+    27: 2135, 28: 2062,
+    29: 5595, 30: 5525,
+    31: 3292, 32: 3318,
+    33: 6691, 34: 6718
   }
 
   colors = get_body_color(labels)
