@@ -23,8 +23,11 @@ class LBSMesh():
 
     self.j_regressor = np.zeros([skeleton.n_keypoints, self.n_verts], dtype)
 
-    self.j_regressor[:data['J_regressor'].shape[0]] = \
-      data['J_regressor'].toarray()
+    # some early version uses scipy sparse array
+    if type(data['J_regressor']) != np.ndarray:
+      data['J_regressor'] = data['J_regressor'].toarray()
+
+    self.j_regressor[:data['J_regressor'].shape[0]] = data['J_regressor']
     for k, v in skeleton.extended_keypoints.items():
       self.j_regressor[k] = 0
       self.j_regressor[k, v] = 1
@@ -61,7 +64,7 @@ class LBSMesh():
 
     # convert pose from children style to parent style
     outputs = [
-      np.zeros([pose.shape[0], 3], self.dtype) \
+      np.zeros([pose.shape[0]] + list(pose[0][0].shape), self.dtype) \
         for _ in range(self.skeleton.n_keypoints)
     ]
     for c, p in enumerate(self.parents):
@@ -132,8 +135,9 @@ class LBSMesh():
 
     if not batch:
       posed_keypoints = posed_keypoints[0]
-      posed_verts = posed_verts[0]
       pose = pose[0]
+      if return_mesh:
+        posed_verts = posed_verts[0]
 
     if return_details:
       pack = {
@@ -145,4 +149,7 @@ class LBSMesh():
         pack['posed_verts'] = posed_verts
       return pack
 
-    return posed_keypoints, posed_verts
+    if return_mesh:
+      return posed_keypoints, posed_verts
+    else:
+      return posed_keypoints
