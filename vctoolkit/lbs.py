@@ -64,7 +64,7 @@ class LBSMesh():
 
     # convert pose from children style to parent style
     outputs = [
-      np.zeros([pose.shape[0]] + list(pose[0][0].shape), self.dtype) \
+      np.tile(np.expand_dims(np.eye(3), 0), [pose.shape[0], 1, 1]) \
         for _ in range(self.skeleton.n_keypoints)
     ]
     for c, p in enumerate(self.parents):
@@ -107,11 +107,11 @@ class LBSMesh():
         keypoints = keypoints[0]
       return keypoints, verts, None
 
-    if reference == 'parent':
-      pose = self.pose_parent_to_children(pose, batch=True)
-
     if format != 'rotmat':
       pose = math_np.convert(pose, format, 'rotmat')
+
+    if reference == 'parent':
+      pose = self.pose_parent_to_children(pose, batch=True)
 
     if relative:
       pose = math_np.rotmat_rel_to_abs(pose, self.parents, batch=True)
