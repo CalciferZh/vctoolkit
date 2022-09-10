@@ -123,7 +123,12 @@ class LBSMesh():
     if return_mesh:
       j_mat = posed_keypoints - np.einsum('njhw, njw -> njh', pose, keypoints)
       g_mat = np.concatenate([pose, np.expand_dims(j_mat, -1)], -1)
-      verts = np.concatenate([verts, np.tile(self.ones, [pose.shape[0], 1, 1])], -1)
+      verts = np.concatenate(
+        [
+          np.tile(verts, [pose.shape[0], 1, 1]),
+          np.tile(self.ones, [pose.shape[0], 1, 1])
+        ], -1
+      )
       posed_verts = np.einsum(
         'vj, njvd -> nvd',
         self.skinning_weights, np.einsum('njhw, nvw -> njvh', g_mat, verts)
