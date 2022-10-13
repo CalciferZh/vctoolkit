@@ -502,10 +502,13 @@ def load_obj(file_path):
   verts = []
   faces = []
   for l in lines:
-    if l[0] == 'v':
-      verts.append(np.array([float(v) for v in l.split()[1:]]))
-    elif l[0] == 'f':
-      faces.append(np.array([int(v) - 1 for v in l.split()[1:]]))
+    units = l.split()
+    if len(units) != 4:
+      continue
+    if units[0] == 'v':
+      verts.append(np.array([float(v) for v in units[1:]]))
+    elif units[0] == 'f':
+      faces.append(np.array([int(f.split('//')[0]) - 1 for f in units[1:]]))
   verts = np.array(verts)
   faces = np.array(faces)
   return verts, faces
