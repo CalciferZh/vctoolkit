@@ -76,7 +76,7 @@ def render_sequence_3d(verts, faces, width, height, video_path, fps=30,
   writer.close()
 
 
-def create_o3d_mesh(verts, faces):
+def create_o3d_mesh(verts, faces, colors=None):
   """
   Create a open3d mesh from vertices and faces.
 
@@ -95,6 +95,8 @@ def create_o3d_mesh(verts, faces):
   mesh = o3d.geometry.TriangleMesh()
   mesh.triangles = o3d.utility.Vector3iVector(faces)
   mesh.vertices = o3d.utility.Vector3dVector(verts)
+  if colors is not None:
+    mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
   mesh.compute_vertex_normals()
   return mesh
 
@@ -119,4 +121,3 @@ def vis_mesh(verts, faces, width=1080, height=1080):
   viewer.create_window(width=width, height=height, visible=True)
   viewer.add_geometry(mesh)
   viewer.run()
-

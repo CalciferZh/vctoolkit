@@ -203,13 +203,14 @@ def render_bones_plt(joints, parents):
   plt.show()
 
 
-def put_text(img, text, origin=None, color=(0, 255, 0)):
+def put_text(img, text, origin=None, color=(0, 255, 0), size=None):
   """
   origin : tuple, optional
     (x, y), by default None
   """
   font = cv2.FONT_HERSHEY_DUPLEX
-  size = int(math.ceil(max(img.shape) / 128))
+  if size == None:
+    size = int(math.ceil(max(img.shape) / 128))
   box = cv2.getTextSize(text, fontFace=font, fontScale=size, thickness=size)
   if origin is None:
     origin = (10, 10)
