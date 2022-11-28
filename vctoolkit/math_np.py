@@ -245,9 +245,10 @@ def slerp(a, b, t):
   return p
 
 
-def procrustes_align(s1, s2):
+
+def procrustes_align(s1, s2, return_rst=False):
   """
-  Procrustes alignment.
+  Procrustes alignment. s1_hat = (s * r.dot(s1.T) + t).T
 
   Parameters
   ----------
@@ -287,5 +288,8 @@ def procrustes_align(s1, s2):
   t = m2 - scale * (R.dot(m1))
 
   s1_hat = scale * R.dot(s1) + t
+
+  if return_rst:
+    return R, scale, t
 
   return s1_hat.T
