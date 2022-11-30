@@ -34,26 +34,28 @@ def load(path):
     raise NotImplementedError('Unsupported file extension: ' + path)
 
 
-def save(path, data):
+def save(path, data, **kwargs):
   ext = os.path.splitext(path)[1][1:]
   if ext == 'json':
-    return save_json(path, data)
+    return save_json(path, data, **kwargs)
   elif ext == 'h5':
-    return save_hdf5(path, data)
+    return save_hdf5(path, data, **kwargs)
   elif ext == 'txt':
-    return save_txt(path, data)
+    return save_txt(path, data, **kwargs)
   elif ext == 'pkl':
-    return save_pkl(path, data)
+    return save_pkl(path, data, **kwargs)
   elif ext in ['png', 'jpg', 'jpeg']:
-    return save_img(path, data)
+    return save_img(path, data, **kwargs)
   elif ext == 'obj':
-    return save_obj(path, *data)
+    return save_obj(path, *data, **kwargs)
   elif ext == 'npy':
-    return np.save(path, data)
+    return np.save(path, data, **kwargs)
   elif ext == 'npz':
-    return np.savez(path, data)
+    return np.savez(path, data, **kwargs)
   elif ext == 'yaml':
-    return save_yaml(path, data)
+    return save_yaml(path, data, **kwargs)
+  elif ext == 'gif':
+    imageio.mimsave(path, data, **kwargs)
   else:
     raise NotImplementedError('Unsupported file extension: ' + path)
 
