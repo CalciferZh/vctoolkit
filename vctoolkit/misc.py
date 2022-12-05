@@ -473,19 +473,23 @@ def press_to_continue(exit_0=True):
   return True
 
 
-def examine_dict(data, indent=0):
-  for k, v in data.items():
-    print('  ' * indent, k, type(v), end=', ')
-    if hasattr(v, 'shape'):
-      print(f'shape = {v.shape}', end='')
-      if hasattr(v,'dtype'):
-        print(f', dtype = {v.dtype}', end='')
-    elif type(v) == dict:
-      print()
-      examine_dict(v, indent + 1)
-    elif hasattr(v, '__len__'):
-      print(f'length = {len(v)}', end='')
-    print()
+def inspect(data, indent=0):
+  print(' ' * indent + f'Data type: {type(data)}')
+  if type(data) == list:
+    print(' ' * indent + f'length: {len(data)} first item:')
+    inspect(data[0], indent=2)
+  elif type(data) == dict:
+    for k, v in data.items():
+      print('  ' * indent, k, type(v), end=', ')
+      inspect(v)
+  else:
+    if hasattr(data, 'shape'):
+      print(' ' * indent + f'shape = {data.shape}')
+    if hasattr(data, 'dtype'):
+      print(' ' * indent + f'dtype = {data.dtype}')
+
+
+examine_dict = inspect
 
 
 def set_extension(file_name, ext):

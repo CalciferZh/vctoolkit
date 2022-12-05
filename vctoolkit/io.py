@@ -56,8 +56,17 @@ def save(path, data, **kwargs):
     return save_yaml(path, data, **kwargs)
   elif ext == 'gif':
     imageio.mimsave(path, data, **kwargs)
+  elif ext in ['mp4', 'avi']:
+    return save_video(path, data, **kwargs)
   else:
     raise NotImplementedError('Unsupported file extension: ' + path)
+
+
+def save_video(path, data, fps):
+  writer = VideoWriter(path, data[0].shape[1], data[0].shape[0], fps)
+  for frame in data:
+    writer.write_frame(frame)
+  writer.close()
 
 
 def load_yaml(path):
