@@ -477,11 +477,11 @@ def inspect(data, indent=0):
   print(' ' * indent + f'Data type: {type(data)}')
   if type(data) == list:
     print(' ' * indent + f'length: {len(data)} first item:')
-    inspect(data[0], indent=indent + 1)
+    inspect(data[0], indent=indent + 2)
   elif type(data) == dict:
     for k, v in data.items():
-      print('  ' * indent, k, type(v), end=', ')
-      inspect(v, indent=indent + 1)
+      print('  ' * indent, k, type(v))
+      inspect(v, indent=indent + 2)
   else:
     if hasattr(data, 'shape'):
       print(' ' * indent + f'shape = {data.shape}')
