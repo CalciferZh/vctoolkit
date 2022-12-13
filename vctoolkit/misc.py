@@ -2,12 +2,9 @@ import numpy as np
 import cv2
 import time
 import uuid as uuid_import
-import transforms3d
 import tqdm
 import os
-import math
 
-from .io import load_hdf5
 
 
 color_lib = [
@@ -473,20 +470,38 @@ def press_to_continue(exit_0=True):
   return True
 
 
-def inspect(data, indent=0):
-  print(' ' * indent + f'Data type: {type(data)}')
+def basic_statistics(data, axis=None, print_out=True):
+  metrics = ['min', 'mean', 'max', 'std']
+  info = [getattr(np, m)(data, axis) for m in metrics]
+  s = ' '.join([f'{m} = {x:.2e}' for m, x in zip(metrics, info)])
+  if print_out:
+    print(s)
+  return s
+
+
+def inspect(data, indent=0, max_len=10):
+  space = '  ' * indent
+  print(space + f'Data type: {type(data)}')
   if type(data) == list:
-    print(' ' * indent + f'length: {len(data)} first item:')
+    print(space + f'length: {len(data)} first item:')
     inspect(data[0], indent=indent + 2)
   elif type(data) == dict:
+    print(space + f'Total items: {len(data)}')
+    print(space + f'Keys:')
+    cnt = 0
     for k, v in data.items():
-      print('  ' * indent, k, type(v))
+      print(space, k, type(v))
       inspect(v, indent=indent + 2)
+      cnt += 1
+      if cnt >= max_len:
+        break
   else:
     if hasattr(data, 'shape'):
-      print(' ' * indent + f'shape = {data.shape}')
+      print(space + f'shape = {data.shape}')
     if hasattr(data, 'dtype'):
-      print(' ' * indent + f'dtype = {data.dtype}')
+      print(space + f'dtype = {data.dtype}')
+    if type(data) == np.ndarray:
+      print(space + basic_statistics(data, axis=None, print_out=False))
 
 
 examine_dict = inspect
