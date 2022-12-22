@@ -4,7 +4,7 @@ import time
 import uuid as uuid_import
 import tqdm
 import os
-
+import matplotlib.pyplot as plt
 
 
 color_lib = [
@@ -513,3 +513,27 @@ def set_extension(file_name, ext):
 
 def count_model_parameters(model):
   return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+def hist(data, figsize=(12, 8), xlabel='', ylabel='', title='', save_path=None, show=False):
+  plt.figure(figsize=figsize)
+  _, _, patches = plt.hist(data, bins=20)
+  plt.xlabel(xlabel)
+  plt.ylabel(ylabel)
+
+  if title != '':
+    title += '\n'
+  title += f'mean {np.mean(data):.2f} std {np.std(data):.2f} '
+  plt.title(title)
+
+  for p in patches:
+    plt.text(
+      p.xy[0], p.xy[1] + p.get_height(),
+      f'{p.xy[0]:.1f} - {p.xy[0] + p.get_width():.1f} \n {p.xy[1] + p.get_height() / len(data)*100:.2f}%'
+    )
+
+  if save_path is not None:
+    plt.savefig(save_path)
+
+  if show:
+    plt.show()
