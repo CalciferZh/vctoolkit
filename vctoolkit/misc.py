@@ -483,11 +483,15 @@ def inspect(data, indent=0, max_len=10):
   space = '  ' * indent
   print(space + f'Data type: {type(data)}')
   if type(data) == list:
-    print(space + f'length: {len(data)} first item:')
+    print(space + f'length: {len(data)}')
+    print(space + 'first item:')
     inspect(data[0], indent=indent + 2)
+  elif type(data) == str:
+    print(space + f'String of length {len(data)}: {data}')
   elif type(data) == dict:
     print(space + f'Total items: {len(data)}')
-    print(space + f'Keys:')
+    if len(data) > max_len:
+      print(space + f'First {max_len} items:')
     cnt = 0
     for k, v in data.items():
       print(space, k, type(v))

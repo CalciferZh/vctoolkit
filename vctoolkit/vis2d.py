@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from .misc import *
 from .io import *
+import math
 
 
 def imshow_cv(img, caption='OpenCV Image Show'):
@@ -210,7 +211,7 @@ def put_text(img, text, origin=None, color=(0, 255, 0), size=None):
   """
   font = cv2.FONT_HERSHEY_DUPLEX
   if size == None:
-    size = int(math.ceil(max(img.shape) / 128))
+    size = int(math.ceil(min(img.shape) / 128))
   box = cv2.getTextSize(text, fontFace=font, fontScale=size, thickness=size)
   if origin is None:
     origin = (10, 10)
