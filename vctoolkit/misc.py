@@ -408,6 +408,9 @@ def progress_bar(producer, text=None):
   return tqdm.tqdm(list(producer), ascii=True, desc=text, dynamic_ncols=True)
 
 
+pbar = progress_bar
+
+
 def get_bbox(uv, scale, limit,
              rand_scale=False, rand_min=1.0, rand_max=2.0, square=False):
   """
@@ -468,6 +471,9 @@ def press_to_continue(exit_0=True):
     else:
       return False
   return True
+
+
+wait = press_to_continue()
 
 
 def basic_statistics(data, axis=None, print_out=True):

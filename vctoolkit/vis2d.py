@@ -220,32 +220,32 @@ def put_text(img, text, origin=None, color=(0, 255, 0), size=None):
   return img
 
 
-def concat_videos(src_paths, tar_path, height=None, width=None):
-  """
-  You should only set height or width.
-  """
-  if height is None and width is None:
-    raise RuntimeError('You must set either the height or the width.')
-  readers = [VideoReader(p) for p in src_paths]
+def concat_videos(src_paths, tar_path, render_name=False, unit_height=None, unit_width=None):
+  assert not (unit_height and unit_width)
+
   writer = None
-  for _ in progress_bar(readers[0].n_frames + 10):
-    canvas = []
-    for r in readers:
-      frame = r.next_frame()
-      if frame is None:
-        canvas = []
-        break
-      canvas.append(imresize_diag(frame, width, height))
-    if not canvas:
+  readers = [[VideoReader(c) for c in r] for r in src_paths]
+  for _ in pbar(readers[0][0].n_frames):
+    patches = []
+    done = False
+    for ri, row in enumerate(readers):
+      patches.append([])
+      for ci, col in enumerate(row):
+        frame = col.next_frame()
+        if frame is None:
+          done = True
+          continue
+        if unit_height is not None:
+          frame = imresize_diag(frame, unit_height)
+        if render_name:
+          put_text(frame, os.path.basename(src_paths[ri][ci]))
+        patches[-1].append(frame)
+
+    if done:
       break
-    if height is None:
-      canvas = np.concatenate(canvas, 0)
-    else:
-      canvas = np.concatenate(canvas, 1)
+
+    canvas = np.concatenate([np.concatenate(r, 1) for r in patches], 0)
     if writer is None:
-      writer = \
-        VideoWriter(tar_path, canvas.shape[1], canvas.shape[0], readers[0].fps)
+      writer = VideoWriter(tar_path, canvas.shape[1], canvas.shape[0], readers[0][0].fps)
     writer.write_frame(canvas)
-  for r in readers:
-    r.close()
   writer.close()
