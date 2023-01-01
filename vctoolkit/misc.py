@@ -473,7 +473,7 @@ def press_to_continue(exit_0=True):
   return True
 
 
-wait = press_to_continue()
+wait = press_to_continue
 
 
 def basic_statistics(data, axis=None, print_out=True):
