@@ -484,7 +484,7 @@ def inspect(data, indent=0, max_len=10):
       indent_print(f'First {max_len} items:')
     cnt = 0
     for k, v in data.items():
-      indent_print(, k, type(v))
+      indent_print(k, type(v))
       inspect(v, indent=indent + 2)
       cnt += 1
       if cnt >= max_len:
