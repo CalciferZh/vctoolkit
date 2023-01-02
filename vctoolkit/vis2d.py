@@ -44,7 +44,7 @@ def imshow(img, save_path=None):
     raise NotImplementedError('Unsupported type for visualization: ' + str(type(img)))
 
 
-def imshow_grid(imgs, save_path=None):
+def imshow_grid(imgs, save_path=None, smart_check=True):
   """
   Display multiple images as a grid.
 
@@ -59,6 +59,10 @@ def imshow_grid(imgs, save_path=None):
   save_path : str
     Path to save the figure.
   """
+  # if single-row, make it a grid
+  if smart_check and type(imgs[0]) != list:
+    imgs = [imgs]
+
   fig = plt.figure()
   n_rows = len(imgs)
   n_cols = len(imgs[0])
@@ -235,10 +239,12 @@ def concat_videos(src_paths, tar_path, render_name=False, unit_height=None, unit
         if frame is None:
           done = True
           continue
-        if unit_height is not None:
-          frame = imresize_diag(frame, unit_height)
+
+        frame = imresize(frame, h=unit_height, w=unit_width)
+
         if render_name:
           put_text(frame, os.path.basename(src_paths[ri][ci]))
+
         patches[-1].append(frame)
 
     if done:
@@ -248,4 +254,6 @@ def concat_videos(src_paths, tar_path, render_name=False, unit_height=None, unit
     if writer is None:
       writer = VideoWriter(tar_path, canvas.shape[1], canvas.shape[0], readers[0][0].fps)
     writer.write_frame(canvas)
-  writer.close()
+
+  if writer is not None:
+    writer.close()

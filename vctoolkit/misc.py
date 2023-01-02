@@ -30,26 +30,7 @@ def get_left_right_color(labels,
   return colors
 
 
-def imresize(img, size):
-  """
-  Resize an image.
-
-  Parameters
-  ----------
-  img : np.ndarray
-    Input image.
-  size : tuple
-    Size, (width, height).
-
-  Returns
-  -------
-  np.ndarray
-    Resized image.
-  """
-  return cv2.resize(img, size, cv2.INTER_LINEAR)
-
-
-def imresize_diag(img, w=None, h=None):
+def imresize(img, w=None, h=None, inter=cv2.INTER_LINEAR):
   """
   Resize am image but keep the aspect ratio, according to target width or height.
 
@@ -69,9 +50,11 @@ def imresize_diag(img, w=None, h=None):
   """
   if w is None:
     w = int(round(h / img.shape[0] * img.shape[1]))
-  else:
+
+  if h is None:
     h = int(round(w / img.shape[1] * img.shape[0]))
-  return imresize(img, (w, h))
+
+  return cv2.resize(img, (w, h), inter)
 
 
 def render_gaussian_hmap(centers, shape, sigma=None, dtype=np.float32):
@@ -486,32 +469,33 @@ def basic_statistics(data, axis=None, print_out=True):
 
 
 def inspect(data, indent=0, max_len=10):
-  space = '  ' * indent
-  print(space + f'Data type: {type(data)}')
+  indent_print = lambda x: print(' ' * indent, x, sep='')
+  indent_print(f'data type: {type(data)}')
   if type(data) == list:
-    print(space + f'length: {len(data)}')
-    print(space + 'first item:')
-    inspect(data[0], indent=indent + 2)
+    indent_print(f'length: {len(data)}')
+    for i in range(min(max_len, len(data))):
+      indent_print(f'item {i}:')
+      inspect(data[i], indent=indent + 2)
   elif type(data) == str:
-    print(space + f'String of length {len(data)}: {data}')
+    indent_print(f'string of length {len(data)}: {data}')
   elif type(data) == dict:
-    print(space + f'Total items: {len(data)}')
+    indent_print(f'total items: {len(data)}')
     if len(data) > max_len:
-      print(space + f'First {max_len} items:')
+      indent_print(f'First {max_len} items:')
     cnt = 0
     for k, v in data.items():
-      print(space, k, type(v))
+      indent_print(, k, type(v))
       inspect(v, indent=indent + 2)
       cnt += 1
       if cnt >= max_len:
         break
   else:
     if hasattr(data, 'shape'):
-      print(space + f'shape = {data.shape}')
+      indent_print(f'shape = {data.shape}')
     if hasattr(data, 'dtype'):
-      print(space + f'dtype = {data.dtype}')
+      indent_print(f'dtype = {data.dtype}')
     if type(data) == np.ndarray:
-      print(space + basic_statistics(data, axis=None, print_out=False))
+      indent_print(basic_statistics(data, axis=None, print_out=False))
 
 
 examine_dict = inspect
@@ -526,6 +510,9 @@ def count_model_parameters(model):
 
 
 def hist(data, figsize=(12, 8), xlabel='', ylabel='', title='', save_path=None, show=False):
+  if save_path is None and not show:
+    show = True
+
   plt.figure(figsize=figsize)
   _, _, patches = plt.hist(data, bins=20)
   plt.xlabel(xlabel)
