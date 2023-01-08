@@ -385,9 +385,11 @@ def uuid():
   return uuid_import.uuid4()
 
 
-def progress_bar(producer, text=None):
+def progress_bar(producer, text=None, shuffle=False):
   if type(producer) == int:
     producer = range(producer)
+  if shuffle:
+    np.random.shuffle(producer)
   return tqdm.tqdm(list(producer), ascii=True, desc=text, dynamic_ncols=True)
 
 
@@ -468,16 +470,33 @@ def basic_statistics(data, axis=None, print_out=True):
   return s
 
 
-def inspect(data, indent=0, max_len=10):
-  indent_print = lambda x: print(' ' * indent, x, sep='')
+def inspect(data, indent=0, max_len=10, name_string='', ex=False):
+  def indent_print(*args):
+    print(' ' * indent, *args)
+
+  if indent == 0:
+    print_important(name_string)
+
   indent_print(f'data type: {type(data)}')
   if type(data) == list:
     indent_print(f'length: {len(data)}')
-    for i in range(min(max_len, len(data))):
+
+    # print all elements for short objects, 1 example element for long ones
+    if len(data) <= max_len:
+      n_print = len(data)
+    else:
+      n_print = 1
+
+    for i in range(n_print):
       indent_print(f'item {i}:')
       inspect(data[i], indent=indent + 2)
+
   elif type(data) == str:
     indent_print(f'string of length {len(data)}: {data}')
+
+  elif type(data) in [int, float]:
+    indent_print(data)
+
   elif type(data) == dict:
     indent_print(f'total items: {len(data)}')
     if len(data) > max_len:
@@ -489,13 +508,22 @@ def inspect(data, indent=0, max_len=10):
       cnt += 1
       if cnt >= max_len:
         break
+
   else:
     if hasattr(data, 'shape'):
       indent_print(f'shape = {data.shape}')
     if hasattr(data, 'dtype'):
       indent_print(f'dtype = {data.dtype}')
     if type(data) == np.ndarray:
+      if np.product(data.shape) < 100:
+        print(data)
       indent_print(basic_statistics(data, axis=None, print_out=False))
+
+  if indent == 0:
+    print_important(name_string)
+
+  if ex:
+    exit(0)
 
 
 examine_dict = inspect
@@ -509,12 +537,11 @@ def count_model_parameters(model):
   return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-def hist(data, figsize=(12, 8), xlabel='', ylabel='', title='', save_path=None, show=False):
-  if save_path is None and not show:
-    show = True
+def hist(data, figsize=(12, 8), xlabel='', ylabel='', title='', save_path=None, show=True, subplot=False, details=True):
+  if not subplot:
+    plt.figure(figsize=figsize)
 
-  plt.figure(figsize=figsize)
-  _, _, patches = plt.hist(data, bins=20)
+  _, _, patches = plt.hist(data, bins=min(max(len(data) // 20, 10), 100), edgecolor='black')
   plt.xlabel(xlabel)
   plt.ylabel(ylabel)
 
@@ -523,11 +550,12 @@ def hist(data, figsize=(12, 8), xlabel='', ylabel='', title='', save_path=None, 
   title += f'mean {np.mean(data):.2f} std {np.std(data):.2f} '
   plt.title(title)
 
-  for p in patches:
-    plt.text(
-      p.xy[0], p.xy[1] + p.get_height(),
-      f'{p.xy[0]:.1f} - {p.xy[0] + p.get_width():.1f} \n {p.xy[1] + p.get_height() / len(data)*100:.2f}%'
-    )
+  if details:
+    for p in patches:
+      plt.text(
+        p.xy[0], p.xy[1] + p.get_height(),
+        f'{p.xy[0]:.1f} - {p.xy[0] + p.get_width():.1f} \n {p.xy[1] + p.get_height() / len(data)*100:.2f}%'
+      )
 
   if save_path is not None:
     plt.savefig(save_path)

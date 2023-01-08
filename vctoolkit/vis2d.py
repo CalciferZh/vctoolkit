@@ -21,7 +21,7 @@ def imshow_cv(img, caption='OpenCV Image Show'):
   cv2.waitKey()
 
 
-def imshow(img, save_path=None):
+def imshow(*argv, save_path=None):
   """
   Show an image with matplotlib.
 
@@ -32,16 +32,15 @@ def imshow(img, save_path=None):
   save_path : str
     Path to save the figure.
   """
-  if type(img) == np.ndarray:
-    plt.imshow(img)
+  argv = list(argv)
+  if len(argv) == 1:
+    plt.imshow(argv)
     if save_path is not None:
       plt.savefig(save_path)
     plt.show()
     plt.close()
-  elif type(img) == list:
-    imshow_grid(img)
   else:
-    raise NotImplementedError('Unsupported type for visualization: ' + str(type(img)))
+    imshow_grid(argv)
 
 
 def imshow_grid(imgs, save_path=None, smart_check=True):
