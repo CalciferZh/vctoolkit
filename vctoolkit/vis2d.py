@@ -21,7 +21,7 @@ def imshow_cv(img, caption='OpenCV Image Show'):
   cv2.waitKey()
 
 
-def imshow(*argv, save_path=None):
+def imshow(data, save_path=None):
   """
   Show an image with matplotlib.
 
@@ -32,15 +32,14 @@ def imshow(*argv, save_path=None):
   save_path : str
     Path to save the figure.
   """
-  argv = list(argv)
-  if len(argv) == 1:
-    plt.imshow(argv)
+  if type(data) in [list, tuple]:
+    imshow_grid(data)
+  else:
+    plt.imshow(data)
     if save_path is not None:
       plt.savefig(save_path)
     plt.show()
     plt.close()
-  else:
-    imshow_grid(argv)
 
 
 def imshow_grid(imgs, save_path=None, smart_check=True):

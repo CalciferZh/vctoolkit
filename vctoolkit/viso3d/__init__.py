@@ -101,7 +101,7 @@ def create_o3d_mesh(verts, faces, colors=None):
   return mesh
 
 
-def vis_mesh(verts, faces, width=1080, height=1080):
+def vis_mesh(verts, faces, colors, width=1080, height=1080):
   """
   Visualize mesh with open3d.
 
@@ -116,7 +116,7 @@ def vis_mesh(verts, faces, width=1080, height=1080):
   height : int
     Window height, by default 1080.
   """
-  mesh = create_o3d_mesh(verts, faces)
+  mesh = create_o3d_mesh(verts, faces, colors)
   viewer = o3d.visualization.Visualizer()
   viewer.create_window(width=width, height=height, visible=True)
   viewer.add_geometry(mesh)

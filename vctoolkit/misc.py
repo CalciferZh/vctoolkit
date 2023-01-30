@@ -5,6 +5,7 @@ import uuid as uuid_import
 import tqdm
 import os
 import matplotlib.pyplot as plt
+import sys
 
 
 color_lib = [
@@ -54,8 +55,7 @@ def imresize(img, w=None, h=None, inter=cv2.INTER_LINEAR):
   if h is None:
     h = int(round(w / img.shape[1] * img.shape[0]))
 
-  return cv2.resize(img, (w, h), inter)
-
+  return cv2.resize(img, (w, h), interpolation=inter)
 
 def render_gaussian_hmap(centers, shape, sigma=None, dtype=np.float32):
   """
@@ -64,7 +64,7 @@ def render_gaussian_hmap(centers, shape, sigma=None, dtype=np.float32):
   Parameters
   ----------
   centers : np.ndarray, shape [N, 2]
-    Gussian centers, (row, column).
+    Gaussian centers, (row, column).
   shape : tuple
     Heatmap shape, (height, width)
   sigma : float, optional
@@ -91,7 +91,7 @@ def render_gaussian_hmap(centers, shape, sigma=None, dtype=np.float32):
   return hmap
 
 
-def print_important(s, sep='='):
+def print_important(s='', sep='='):
   """
   Print important message.
 
@@ -100,11 +100,14 @@ def print_important(s, sep='='):
   s : str
     Message.
   sep : str, optional
-    Seperator to fill one line, by default '='
+    Separator to fill one line, by default '='
   """
   print(sep*89)
   print(s)
   print(sep*89)
+
+
+info = print_important
 
 
 def arr_identical(a, b, verbose=True):
@@ -118,7 +121,7 @@ def arr_identical(a, b, verbose=True):
   b : np.ndarray
     Array b.
   verbose : bool, optional
-    Wether print detail infomation, by default True
+    Wether print detail information, by default True
 
   Returns
   -------
@@ -385,11 +388,13 @@ def uuid():
   return uuid_import.uuid4()
 
 
-def progress_bar(producer, text=None, shuffle=False):
+def progress_bar(producer, text=None, shuffle=False, verbose=True):
   if type(producer) == int:
     producer = range(producer)
   if shuffle:
     np.random.shuffle(producer)
+  if not verbose:
+    return producer
   return tqdm.tqdm(list(producer), ascii=True, desc=text, dynamic_ncols=True)
 
 
@@ -470,7 +475,7 @@ def basic_statistics(data, axis=None, print_out=True):
   return s
 
 
-def inspect(data, indent=0, max_len=10, name_string='', ex=False):
+def inspect(data, name_string='', indent=0, max_len=10, ex=False):
   def indent_print(*args):
     print(' ' * indent, *args)
 
@@ -478,7 +483,7 @@ def inspect(data, indent=0, max_len=10, name_string='', ex=False):
     print_important(name_string)
 
   indent_print(f'data type: {type(data)}')
-  if type(data) == list:
+  if type(data) == list or type(data) == tuple:
     indent_print(f'length: {len(data)}')
 
     # print all elements for short objects, 1 example element for long ones
@@ -516,7 +521,8 @@ def inspect(data, indent=0, max_len=10, name_string='', ex=False):
       indent_print(f'dtype = {data.dtype}')
     if type(data) == np.ndarray:
       if np.product(data.shape) < 100:
-        print(data)
+        indent_print('value = ')
+        indent_print(data)
       indent_print(basic_statistics(data, axis=None, print_out=False))
 
   if indent == 0:
@@ -527,6 +533,7 @@ def inspect(data, indent=0, max_len=10, name_string='', ex=False):
 
 
 examine_dict = inspect
+peek = inspect
 
 
 def set_extension(file_name, ext):
@@ -547,7 +554,7 @@ def hist(data, figsize=(12, 8), xlabel='', ylabel='', title='', save_path=None, 
 
   if title != '':
     title += '\n'
-  title += f'mean {np.mean(data):.2f} std {np.std(data):.2f} '
+  title += f'mean {np.mean(data):.2f} std {np.std(data):.2f} n {len(data)}'
   plt.title(title)
 
   if details:
