@@ -569,3 +569,6 @@ def hist(data, figsize=(12, 8), xlabel='', ylabel='', title='', save_path=None, 
 
   if show:
     plt.show()
+
+
+eps = np.finfo(np.float32).eps
