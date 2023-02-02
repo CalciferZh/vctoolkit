@@ -21,7 +21,7 @@ def imshow_cv(img, caption='OpenCV Image Show'):
   cv2.waitKey()
 
 
-def imshow(data, save_path=None):
+def imshow(data, save_path=None, figsize=(16, 9), show=True):
   """
   Show an image with matplotlib.
 
@@ -33,16 +33,18 @@ def imshow(data, save_path=None):
     Path to save the figure.
   """
   if type(data) in [list, tuple]:
-    imshow_grid(data)
+    imshow_grid(data, save_path, figsize=figsize, show=show)
   else:
+    fig = plt.figure(figsize=figsize)
     plt.imshow(data)
     if save_path is not None:
       plt.savefig(save_path)
-    plt.show()
+    if show:
+      plt.show()
     plt.close()
 
 
-def imshow_grid(imgs, save_path=None, smart_check=True):
+def imshow_grid(imgs, save_path=None, smart_check=True, figsize=(16, 9), show=True):
   """
   Display multiple images as a grid.
 
@@ -61,7 +63,7 @@ def imshow_grid(imgs, save_path=None, smart_check=True):
   if smart_check and type(imgs[0]) != list:
     imgs = [imgs]
 
-  fig = plt.figure()
+  fig = plt.figure(figsize=figsize)
   n_rows = len(imgs)
   n_cols = len(imgs[0])
   for i, img in enumerate(sum(imgs, [])):
@@ -69,7 +71,8 @@ def imshow_grid(imgs, save_path=None, smart_check=True):
     plt.imshow(img)
   if save_path is not None:
     plt.savefig(save_path)
-  plt.show()
+  if show:
+    plt.show()
   plt.close(fig)
 
 
