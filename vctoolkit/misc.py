@@ -6,6 +6,7 @@ import tqdm
 import os
 import matplotlib.pyplot as plt
 import sys
+import torch
 
 
 color_lib = [
@@ -519,7 +520,7 @@ def inspect(data, name_string='', indent=0, max_len=10, ex=False):
       indent_print(f'shape = {data.shape}')
     if hasattr(data, 'dtype'):
       indent_print(f'dtype = {data.dtype}')
-    if type(data) == np.ndarray:
+    if type(data) == np.ndarray or type(data) == torch.Tensor:
       if np.product(data.shape) < 100:
         indent_print('value = ')
         indent_print(data)
