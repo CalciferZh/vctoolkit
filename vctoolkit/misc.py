@@ -544,11 +544,17 @@ def count_model_parameters(model):
   return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-def hist(data, figsize=(12, 8), xlabel='', ylabel='', title='', save_path=None, show=True, subplot=False, details=True):
+def hist(data, figsize=(12, 8), xlabel='', ylabel='', title='', save_path=None, show=True, subplot=False, details=True, nb=None):
   if not subplot:
     plt.figure(figsize=figsize)
 
-  _, _, patches = plt.hist(data, bins=min(max(len(data) // 20, 10), 100), edgecolor='black')
+  if nb is None:
+    if details:
+      nb = 10
+    else:
+      nb = min(max(len(data) // 20, 10), 100)
+
+  _, _, patches = plt.hist(data, bins=nb, edgecolor='black')
   plt.xlabel(xlabel)
   plt.ylabel(ylabel)
 
