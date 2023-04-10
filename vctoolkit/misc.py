@@ -579,3 +579,10 @@ def hist(data, figsize=(12, 8), xlabel='', ylabel='', title='', save_path=None, 
 
 
 eps = np.finfo(np.float32).eps
+
+
+def stats(data, precision=2, notation='f'):
+  # "{1:,.{0}f}$".format(2, 1000 + 1/float(3))
+  s = 'mean = {2:.{0}{1}} std = {3:.{0}{1}} min = {4:.{0}{1}} max = {5:.{0}{1}}'
+  s = s.format(precision, notation, np.mean(data), np.std(data), np.min(data), np.max(data))
+  return s
