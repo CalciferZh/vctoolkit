@@ -38,7 +38,7 @@ def imresize(img, w=None, h=None, inter=cv2.INTER_LINEAR):
 
   Parameters
   ----------
-  img : [H, W, C]
+  img : [H, W, ...]
     Image.
   w : int, optional
     Target width, by default None
@@ -50,13 +50,19 @@ def imresize(img, w=None, h=None, inter=cv2.INTER_LINEAR):
   [H, W, C]
     Image.
   """
+
   if w is None:
     w = int(round(h / img.shape[0] * img.shape[1]))
 
   if h is None:
     h = int(round(w / img.shape[1] * img.shape[0]))
 
-  return cv2.resize(img, (w, h), interpolation=inter)
+  ori_shape = img.shape[2:]
+  img = np.reshape(img, [img.shape[0], img.shape[1], -1])
+  img = cv2.resize(img, (w, h), interpolation=inter)
+  img = np.reshape(img, [h, w] + list(ori_shape))
+  return img
+
 
 def render_gaussian_hmap(centers, shape, sigma=None, dtype=np.float32):
   """
