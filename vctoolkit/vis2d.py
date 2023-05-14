@@ -258,3 +258,6 @@ def concat_videos(src_paths, tar_path, render_name=False, unit_height=None, unit
 
   if writer is not None:
     writer.close()
+
+
+jet = plt.cm.get_cmap("jet")
